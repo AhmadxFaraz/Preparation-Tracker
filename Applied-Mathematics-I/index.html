@@ -17,13 +17,13 @@
     .mono { font-family: 'JetBrains Mono', monospace; }
 
     .glow:hover {
-      box-shadow: 0 0 25px rgba(99,102,241,0.35);
+      box-shadow: 0 0 25px rgba(34,211,238,0.35);
       transform: translateY(-6px);
     }
 
     .animated-border {
       position: relative;
-      background: #1e293b;
+      background: #0f1a2b;
       border-radius: 1rem;
     }
 
@@ -33,7 +33,7 @@
       inset: -1px;
       border-radius: 1rem;
       padding: 1px;
-      background: linear-gradient(45deg,#6366f1,#22d3ee,#3b82f6,#6366f1);
+      background: linear-gradient(45deg,#f59e0b,#34d399,#22d3ee,#f59e0b);
       background-size: 300% 300%;
       animation: borderFlow 6s linear infinite;
       -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -61,9 +61,9 @@
 <canvas id="bgCanvas"></canvas>
 
 <header class="text-center py-16 px-4">
-  <p class="mono text-xs md:text-sm text-indigo-300 tracking-widest uppercase">Course Track</p>
+  <p class="mono text-xs md:text-sm text-cyan-300 tracking-widest uppercase">Course Track</p>
   <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight mt-2">
-    Applied Mathematics <span class="text-indigo-400">I</span>
+    Applied Mathematics <span class="text-emerald-300">I</span>
   </h1>
   <p class="mt-4 text-slate-400 mono text-sm md:text-base">
     // build.foundations(); solve.systematically();
@@ -77,8 +77,8 @@
 <section class="max-w-5xl mx-auto px-6 pb-20 grid gap-8 sm:grid-cols-2">
   <a href="unit-1.html" class="animated-border glow p-6 transition duration-300">
     <div class="flex justify-between items-center mb-4">
-      <span class="text-xs mono text-indigo-300">UNIT 1</span>
-      <span class="text-xs bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full">Differentiation</span>
+      <span class="text-xs mono text-cyan-300">UNIT 1</span>
+      <span class="text-xs bg-cyan-500/20 text-cyan-300 px-3 py-1 rounded-full">Differentiation</span>
     </div>
     <h3 class="text-xl font-semibold mb-2">Linear Algebra</h3>
     <p class="text-slate-400 text-sm">Matrices, vector spaces, eigen systems, and Cayley-Hamilton.</p>
@@ -95,8 +95,8 @@
 
   <a href="unit-3.html" class="animated-border glow p-6 transition duration-300">
     <div class="flex justify-between items-center mb-4">
-      <span class="text-xs mono text-blue-300">UNIT 3</span>
-      <span class="text-xs bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full">Transforms</span>
+      <span class="text-xs mono text-emerald-300">UNIT 3</span>
+      <span class="text-xs bg-cyan-500/20 text-emerald-300 px-3 py-1 rounded-full">Transforms</span>
     </div>
     <h3 class="text-xl font-semibold mb-2">Differential Calculus & Series</h3>
     <p class="text-slate-400 text-sm">Curve tracing, asymptotes, expansions, and convergence tests.</p>
@@ -104,8 +104,8 @@
 
   <a href="unit-4.html" class="animated-border glow p-6 transition duration-300">
     <div class="flex justify-between items-center mb-4">
-      <span class="text-xs mono text-sky-300">UNIT 4</span>
-      <span class="text-xs bg-sky-500/20 text-sky-300 px-3 py-1 rounded-full">Signals</span>
+      <span class="text-xs mono text-amber-300">UNIT 4</span>
+      <span class="text-xs bg-amber-500/20 text-amber-300 px-3 py-1 rounded-full">Signals</span>
     </div>
     <h3 class="text-xl font-semibold mb-2">Integration & Applications</h3>
     <p class="text-slate-400 text-sm">Improper integrals, Beta/Gamma functions, arc length, and solids.</p>
@@ -131,7 +131,7 @@
   }
 
   function draw() {
-    ctx.fillStyle = "#0f172a";
+    ctx.fillStyle = "#050b14";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     for (let i = 0; i < particleCount; i++) {
@@ -144,7 +144,7 @@
       if (p.y < 0) p.y = canvas.height;
       if (p.y > canvas.height) p.y = 0;
 
-      ctx.fillStyle = "#22d3ee";
+      ctx.fillStyle = "#34d399";
       ctx.beginPath();
       ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
       ctx.fill();
@@ -153,7 +153,7 @@
         const p2 = particles[j];
         const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
         if (dist < 120) {
-          ctx.strokeStyle = "rgba(59,130,246,0.15)";
+          ctx.strokeStyle = "rgba(34,211,238,0.15)";
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(p2.x, p2.y);
