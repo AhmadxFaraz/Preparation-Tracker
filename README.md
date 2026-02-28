@@ -22,25 +22,9 @@ Background animation is selected per page using:
 
 Current mapping:
 
-1. Dashboard index:
-- `index.html` -> `data-bg-mode="math-grid"`
-- Vibe: dynamic engineering grid + harmonic curves
-
-2. Course index pages (shared style):
-- `Applied-Mathematics-I/index.html` -> `data-bg-mode="parametric"`
-- `Applied-Mathematics-II/index.html` -> `data-bg-mode="parametric"`
-- Vibe: parametric/Lissajous motion
-
-3. All 8 unit pages (all unique):
-- `Applied-Mathematics-I/unit-1.html` -> `vector-field`
-- `Applied-Mathematics-I/unit-2.html` -> `contour`
-- `Applied-Mathematics-I/unit-3.html` -> `orbit-rings`
-- `Applied-Mathematics-I/unit-4.html` -> `radar`
-- `Applied-Mathematics-II/unit-1.html` -> `matrix`
-- `Applied-Mathematics-II/unit-2.html` -> `particles`
-- `Applied-Mathematics-II/unit-3.html` -> `math-grid`
-- `Applied-Mathematics-II/unit-4.html` -> `parametric`
-- Vibe: each unit has a distinct technical/math motion identity
+1. All pages:
+- `data-bg-mode="particles"`
+- Vibe: connected particle network
 
 ### Unit app JS layers
 
