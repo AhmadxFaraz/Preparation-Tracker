@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Pathways | Dashboard</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #2dd4bf; /* Teal color from your tracker */
+            --text: #f8fafc;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        p { color: #94a3b8; }
+
+        .pathway-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .subject-card {
+            background: var(--card-bg);
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 25px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px -10px rgba(45, 212, 191, 0.2);
+        }
+
+        .subject-card h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.4rem;
+            color: var(--accent);
+        }
+
+        .status-badge {
+            font-size: 0.8rem;
+            background: rgba(45, 212, 191, 0.1);
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 20px;
+            width: fit-content;
+            margin-bottom: 20px;
+        }
+
+        .btn-view {
+            margin-top: 20px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Math Pathways</h1>
+        <p>Select a subject to track your exam readiness</p>
+    </header>
+
+    <div class="pathway-grid">
+        <a href="applied-math-1.html" class="subject-card">
+            <div>
+                <div class="status-badge">4 Chapters</div>
+                <h3>Applied Mathematics 1</h3>
+            </div>
+            <div class="btn-view">View Progress →</div>
+        </a>
+
+        <a href="applied-math-2.html" class="subject-card">
+            <div>
+                <div class="status-badge">4 Chapters</div>
+                <h3>Applied Mathematics 2</h3>
+            </div>
+            <div class="btn-view">View Progress →</div>
+        </a>
+
+        <a href="higher-math.html" class="subject-card">
+            <div>
+                <div class="status-badge">Core Subject</div>
+                <h3>Higher Mathematics</h3>
+            </div>
+            <div class="btn-view">View Progress →</div>
+        </a>
+
+        <a href="numerical-math.html" class="subject-card">
+            <div>
+                <div class="status-badge">Computational</div>
+                <h3>Numerical Mathematics</h3>
+            </div>
+            <div class="btn-view">View Progress →</div>
+        </a>
+
+        <a href="stats-ml.html" class="subject-card">
+            <div>
+                <div class="status-badge">AI/ML Track</div>
+                <h3>Probability & Stats for ML</h3>
+            </div>
+            <div class="btn-view">View Progress →</div>
+        </a>
+
+        <a href="linear-algebra.html" class="subject-card">
+            <div>
+                <div class="status-badge">Advanced</div>
+                <h3>Linear Algebra for ML & AI</h3>
+            </div>
+            <div class="btn-view">View Progress →</div>
+        </a>
+    </div>
+
+</body>
+</html>

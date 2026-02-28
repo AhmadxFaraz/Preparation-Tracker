@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMS 1122: Unit I Interactive Study Plan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <!-- Chosen Palette: Warm Neutral & Academic Blue - A soothing, focus-oriented palette using warm grays/creams for background and a trustworthy blue for primary actions, inspired by modern study apps. -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F9FAFB;
+            color: #1F2937;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 250px;
+            max-height: 300px;
+        }
+
+        .task-checkbox:checked + div {
+            text-decoration: line-through;
+            color: #9CA3AF;
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Application Structure Plan: 
+         The app is designed as a "Progress Dashboard". 
+         1. Header: High-level course context and reset controls.
+         2. Analytics Section (Top): Visualizes progress immediately to motivate the user. Uses a Doughnut chart for overall completion and a Bar chart for topic-wise breakdown.
+         3. Filter/Control Bar: Allows users to focus on what's left ("Incomplete") or review what's done.
+         4. Topic Cards (Main Content): The syllabus is broken down into 5 distinct cards (Topics). Each card acts as a checklist container. 
+            - Why Cards? They segment the dense list of problems into manageable chunks (Chunking Principle).
+            - Why Checkboxes? Provide immediate gratification and tactile interaction.
+         5. Sticky Footer: Summary stats.
+         This structure transforms a static list of problems into a gamified, trackable workflow.
+    -->
+
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">AMS 1122: Unit I</h1>
+                <p class="text-sm text-gray-500">Lecture Plan Tracker • AhmadxFaraz</p>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="app.resetProgress()" class="text-sm text-red-500 hover:text-red-700 font-medium transition-colors px-3 py-2 rounded hover:bg-red-50">
+                    Reset Progress
+                </button>
+                <div class="hidden sm:block text-right">
+                    <div class="text-xs text-gray-400 uppercase tracking-wide">Midsem Readiness</div>
+                    <div id="header-percent" class="text-xl font-bold text-blue-600">0%</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        
+        <!-- Intro Context -->
+        <section class="mb-8">
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                <h2 class="text-lg font-semibold text-blue-800 mb-1">Study Dashboard</h2>
+                <p class="text-blue-700 text-sm">
+                    Welcome to your interactive lecture plan. This dashboard breaks down your Unit I syllabus into trackable tasks. 
+                    Use the checkboxes to mark progress on theory concepts and problem sets from <strong>J&I</strong> and <strong>Chandrika Prasad</strong>. 
+                    Your progress is visualized below to help you manage your preparation effectively.
+                </p>
+            </div>
+        </section>
+
+        <!-- Visualization Section -->
+        <!-- Visualization & Content Choices:
+             1. Overall Progress (Doughnut Chart): Goal -> Inform/Motivate. Shows 'Completed' vs 'Remaining' to give a quick sense of achievement.
+             2. Topic Breakdown (Bar Chart): Goal -> Compare/Organize. Shows the distribution of tasks across the 5 main topics and how much is done in each. Helps identify weak areas.
+             3. Interaction: Charts update in real-time as checkboxes are clicked.
+             CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+        -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            <!-- Progress Chart -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+                <h3 class="text-gray-700 font-medium mb-4 w-full text-left border-b pb-2">Overall Completion</h3>
+                <div class="chart-container">
+                    <canvas id="progressChart"></canvas>
+                </div>
+                <div id="motivation-text" class="mt-4 text-sm font-medium text-gray-500 text-center italic">
+                    "Start where you are. Use what you have. Do what you can."
+                </div>
+            </div>
+
+            <!-- Topic Breakdown Chart -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+                <h3 class="text-gray-700 font-medium mb-4 w-full text-left border-b pb-2">Progress by Topic</h3>
+                <div class="chart-container">
+                    <canvas id="topicChart"></canvas>
+                </div>
+                <p class="mt-4 text-xs text-gray-400 text-center">
+                    Bars show total tasks vs. completed tasks per section.
+                </p>
+            </div>
+        </section>
+
+        <!-- Filters & Controls -->
+        <section class="flex flex-col sm:flex-row justify-between items-center mb-6 sticky top-20 z-10 bg-[#F9FAFB] py-2">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 sm:mb-0">Syllabus Topics</h2>
+            <div class="flex space-x-2 bg-white p-1 rounded-lg border border-gray-200 shadow-sm">
+                <button onclick="app.setFilter('all')" id="btn-all" class="px-4 py-2 text-sm font-medium rounded-md bg-blue-100 text-blue-700 transition-colors">All</button>
+                <button onclick="app.setFilter('incomplete')" id="btn-incomplete" class="px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 transition-colors">To Do</button>
+                <button onclick="app.setFilter('completed')" id="btn-completed" class="px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 transition-colors">Done</button>
+            </div>
+        </section>
+
+        <!-- Content Grid (Topic Cards) -->
+        <div id="topic-grid" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <!-- Content will be injected here by JS -->
+        </div>
+
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-400 text-sm">
+            <p>Based on Unit 1 Lecture Plan</p>
+            <p class="mt-2">Use this tracker to prepare for your Midsems systematically.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Data Structure ---
+        const studyData = [
+            {
+                id: "topic_1",
+                title: "1. Partial Differentiation & Euler's Theorem",
+                description: "Functions of several variables, homogeneous functions, and verification of Euler's Theorem.",
+                color: "blue",
+                tasks: [
+                    { id: "t1_1", text: "Theory: Functions of several variables", type: "theory", completed: false },
+                    { id: "t1_2", text: "Theory: Partial differentiation", type: "theory", completed: false },
+                    { id: "t1_3", text: "Theory: Homogeneous functions & Euler's theorem", type: "theory", completed: false },
+                    { id: "t1_4", text: "Q.3 Exercise 2.2 (J&I, p.2.30)", type: "problem", completed: false },
+                    { id: "t1_5", text: "Solved Ex 2.22 & 2.23 (J&I, p.2.33)", type: "problem", completed: false },
+                    { id: "t1_6", text: "Q. 1-13 / Exercise 2.3 (J&I, p.2.44)", type: "problem", completed: false },
+                    { id: "t1_7", text: "Verify Euler: f(x,y) = (x^1/4 + y^1/4) / (x^1/5 + y^1/5)", type: "problem", completed: false },
+                    { id: "t1_8", text: "Verify Euler: f(x,y) = (x^2 - 3xy) / (x+y)", type: "problem", completed: false },
+                    { id: "t1_9", text: "Solved Ex 2.26 & 2.27 (J&I, p.2.36-37)", type: "problem", completed: false },
+                    { id: "t1_10", text: "Q. 29-33 / Exercise 2.3 (J&I, p.2.45)", type: "problem", completed: false },
+                    { id: "t1_11", text: "Q. 6 & 7 / Example 25 (Chandrika Prasad, p.145)", type: "problem", completed: false },
+                    { id: "t1_12", text: "Q. 15 & 18 / Example 25 (Chandrika Prasad, p.147)", type: "problem", completed: false }
+                ]
+            },
+            {
+                id: "topic_2",
+                title: "2. Total Differential & Change of Variables",
+                description: "Mastering the total differential coefficient and changing variables in functions.",
+                color: "indigo",
+                tasks: [
+                    { id: "t2_1", text: "Theory: Total differential coefficient", type: "theory", completed: false },
+                    { id: "t2_2", text: "Theory: Change of variables", type: "theory", completed: false },
+                    { id: "t2_3", text: "Q. 16-20 / Exercise 2.2 (J&I, p.2.31)", type: "problem", completed: false },
+                    { id: "t2_4", text: "Q. 26-30 / Exercise 2.2 (J&I, p.2.31)", type: "problem", completed: false },
+                    { id: "t2_5", text: "Q. 3, 6, 7 / Example 27 (Chandrika Prasad, p.158-59)", type: "problem", completed: false },
+                    { id: "t2_6", text: "Q. 12, 13 & 14 / Example 27 (Chandrika Prasad, p.158-59)", type: "problem", completed: false }
+                ]
+            },
+            {
+                id: "topic_3",
+                title: "3. Jacobians",
+                description: "Definition and properties of Jacobians.",
+                color: "purple",
+                tasks: [
+                    { id: "t3_1", text: "Theory: Jacobian Definition and properties", type: "theory", completed: false },
+                    { id: "t3_2", text: "Solved Example 2.19 (J&I, p.2.27)", type: "problem", completed: false },
+                    { id: "t3_3", text: "Solved Example 2.20(a) (J&I, p.2.28)", type: "problem", completed: false },
+                    { id: "t3_4", text: "Q. 1-8 / Example 28 (Chandrika Prasad, p.161-162)", type: "problem", completed: false }
+                ]
+            },
+            {
+                id: "topic_4",
+                title: "4. Taylor Series & Errors",
+                description: "Expansions of functions of two variables and approximation methods.",
+                color: "teal",
+                tasks: [
+                    { id: "t4_1", text: "Theory: Taylor series for function of two variables", type: "theory", completed: false },
+                    { id: "t4_2", text: "Q. 36-40 / Exercise 2.3 (J&I, p.2.45)", type: "problem", completed: false },
+                    { id: "t4_3", text: "Theory: Error and Approximations", type: "theory", completed: false },
+                    { id: "t4_4", text: "Q. 4-9 / Example 29 (Chandrika Prasad, p.165-66)", type: "problem", completed: false },
+                    { id: "t4_5", text: "Q. 48-52 / Exercise 2.2 (J&I, p.2.32)", type: "problem", completed: false }
+                ]
+            },
+            {
+                id: "topic_5",
+                title: "5. Maxima and Minima",
+                description: "Optimization using the 2nd derivative test.",
+                color: "amber",
+                tasks: [
+                    { id: "t5_1", text: "Theory: Maxima and minima of function of two variables", type: "theory", completed: false },
+                    { id: "t5_2", text: "Theory: 2nd derivative test", type: "theory", completed: false },
+                    { id: "t5_3", text: "Q. 1-6 / Exercise 2.4 (J&I, p.2.54)", type: "problem", completed: false },
+                    { id: "t5_4", text: "Q. 5, 7, 8 & 15 / Example 30 (Chandrika Prasad, p.174-75)", type: "problem", completed: false }
+                ]
+            }
+        ];
+
+        // --- Application Logic ---
+        const app = {
+            data: JSON.parse(localStorage.getItem('ams1122_data')) || studyData,
+            filter: 'all',
+            charts: {},
+
+            init() {
+                this.renderTasks();
+                this.initCharts();
+                this.updateStats();
+            },
+
+            save() {
+                localStorage.setItem('ams1122_data', JSON.stringify(this.data));
+                this.updateStats();
+                this.updateChartsData();
+            },
+
+            toggleTask(topicIndex, taskIndex) {
+                this.data[topicIndex].tasks[taskIndex].completed = !this.data[topicIndex].tasks[taskIndex].completed;
+                this.save();
+                this.renderTasks(); // Re-render to update UI state
+            },
+
+            setFilter(filterType) {
+                this.filter = filterType;
+                
+                // Update Button Styles
+                ['all', 'incomplete', 'completed'].forEach(type => {
+                    const btn = document.getElementById(`btn-${type}`);
+                    if (type === filterType) {
+                        btn.className = "px-4 py-2 text-sm font-medium rounded-md bg-blue-100 text-blue-700 transition-colors";
+                    } else {
+                        btn.className = "px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 transition-colors";
+                    }
+                });
+
+                this.renderTasks();
+            },
+
+            resetProgress() {
+                if(confirm("Are you sure you want to reset all progress?")) {
+                    this.data = JSON.parse(JSON.stringify(studyData)); // Deep copy reset
+                    this.save();
+                    this.renderTasks();
+                }
+            },
+
+            getCounts() {
+                let total = 0;
+                let completed = 0;
+                this.data.forEach(topic => {
+                    topic.tasks.forEach(task => {
+                        total++;
+                        if (task.completed) completed++;
+                    });
+                });
+                return { total, completed, percent: total === 0 ? 0 : Math.round((completed / total) * 100) };
+            },
+
+            updateStats() {
+                const stats = this.getCounts();
+                document.getElementById('header-percent').textContent = `${stats.percent}%`;
+                
+                // Update motivator text based on percent
+                const motivator = document.getElementById('motivation-text');
+                if (stats.percent === 0) motivator.textContent = '"The journey of a thousand miles begins with a single step."';
+                else if (stats.percent < 25) motivator.textContent = '"Great start! Keep the momentum going."';
+                else if (stats.percent < 50) motivator.textContent = '"You are making solid progress. Don\'t stop now!"';
+                else if (stats.percent < 75) motivator.textContent = '"Over halfway there! You\'re crushing it."';
+                else if (stats.percent < 100) motivator.textContent = '"Almost done! Finish strong."';
+                else motivator.textContent = '"Congratulations! You are ready for the Midsems."';
+            },
+
+            initCharts() {
+                // Progress Chart (Doughnut)
+                const ctxProgress = document.getElementById('progressChart').getContext('2d');
+                this.charts.progress = new Chart(ctxProgress, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Completed', 'Remaining'],
+                        datasets: [{
+                            data: [0, 100],
+                            backgroundColor: ['#3B82F6', '#E5E7EB'],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '75%',
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+
+                // Topic Chart (Bar)
+                const ctxTopic = document.getElementById('topicChart').getContext('2d');
+                this.charts.topic = new Chart(ctxTopic, {
+                    type: 'bar',
+                    data: {
+                        labels: this.data.map(t => `Topic ${t.id.split('_')[1]}`),
+                        datasets: [
+                            {
+                                label: 'Completed',
+                                data: [],
+                                backgroundColor: '#3B82F6',
+                                borderRadius: 4,
+                            },
+                            {
+                                label: 'Total Tasks',
+                                data: [],
+                                backgroundColor: '#E5E7EB',
+                                borderRadius: 4,
+                                grouped: false // Stack them to show "background" effect roughly or just separate bars. Let's do grouped: false to make it look like a progress bar background
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, grid: { display: false } },
+                            x: { grid: { display: false } }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    title: (context) => {
+                                        const index = context[0].dataIndex;
+                                        return app.data[index].title;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                
+                this.updateChartsData();
+            },
+
+            updateChartsData() {
+                const counts = this.getCounts();
+                
+                // Update Doughnut
+                this.charts.progress.data.datasets[0].data = [counts.completed, counts.total - counts.completed];
+                this.charts.progress.update();
+
+                // Update Bar
+                const topicCompleted = this.data.map(topic => topic.tasks.filter(t => t.completed).length);
+                const topicTotal = this.data.map(topic => topic.tasks.length);
+
+                // Note: To make "Total" appear "behind" Completed, we render Total first in the array if stacking, 
+                // but here we used grouped: false which overlaps them. The first dataset is drawn *over* the second? 
+                // No, usually subsequent datasets draw on top.
+                // Let's swap the order in the datasets config or update logic.
+                // Actually, standard bar chart side-by-side is clearer for comparison.
+                
+                this.charts.topic.data.datasets[0].data = topicCompleted;
+                this.charts.topic.data.datasets[1].data = topicTotal;
+                this.charts.topic.update();
+            },
+
+            renderTasks() {
+                const grid = document.getElementById('topic-grid');
+                grid.innerHTML = '';
+
+                this.data.forEach((topic, tIndex) => {
+                    // Filter tasks
+                    const filteredTasks = topic.tasks.filter(task => {
+                        if (this.filter === 'all') return true;
+                        if (this.filter === 'completed') return task.completed;
+                        if (this.filter === 'incomplete') return !task.completed;
+                    });
+
+                    // Don't show empty cards if filter hides all tasks
+                    if (filteredTasks.length === 0 && this.filter !== 'all') return;
+
+                    // Calculate Topic Progress
+                    const tTotal = topic.tasks.length;
+                    const tDone = topic.tasks.filter(t => t.completed).length;
+                    const tPercent = tTotal === 0 ? 0 : Math.round((tDone / tTotal) * 100);
+
+                    // Create Card
+                    const card = document.createElement('div');
+                    card.className = "bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden card-hover flex flex-col";
+                    
+                    // Header Color Stripe
+                    const stripeMap = {
+                        blue: 'bg-blue-500',
+                        indigo: 'bg-indigo-500',
+                        purple: 'bg-purple-500',
+                        teal: 'bg-teal-500',
+                        amber: 'bg-amber-500'
+                    };
+                    const badgeMap = {
+                        blue: 'bg-blue-100 text-blue-800',
+                        indigo: 'bg-indigo-100 text-indigo-800',
+                        purple: 'bg-purple-100 text-purple-800',
+                        teal: 'bg-teal-100 text-teal-800',
+                        amber: 'bg-amber-100 text-amber-800'
+                    };
+                    
+                    const headerClass = stripeMap[topic.color] || 'bg-gray-500';
+                    const badgeClass = badgeMap[topic.color] || 'bg-gray-100 text-gray-800';
+
+                    card.innerHTML = `
+                        <div class="h-2 ${headerClass} w-full"></div>
+                        <div class="p-5 flex-grow">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeClass}">
+                                    Topic ${tIndex + 1}
+                                </span>
+                                <span class="text-xs font-bold text-gray-400">${tDone}/${tTotal}</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-800 mb-1 leading-tight">${topic.title}</h3>
+                            <p class="text-xs text-gray-500 mb-4 h-8 overflow-hidden">${topic.description}</p>
+                            
+                            <!-- Progress Bar -->
+                            <div class="w-full bg-gray-200 rounded-full h-1.5 mb-4">
+                                <div class="${headerClass} h-1.5 rounded-full transition-all duration-500" style="width: ${tPercent}%"></div>
+                            </div>
+
+                            <!-- Task List -->
+                            <div class="space-y-3">
+                                ${filteredTasks.map((task, localIndex) => {
+                                    // Find original index for toggle
+                                    const originalIndex = topic.tasks.findIndex(t => t.id === task.id);
+                                    return `
+                                    <label class="flex items-start space-x-3 cursor-pointer group">
+                                        <input type="checkbox" 
+                                            class="task-checkbox form-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 transition duration-150 ease-in-out mt-0.5" 
+                                            ${task.completed ? 'checked' : ''} 
+                                            onchange="app.toggleTask(${tIndex}, ${originalIndex})"
+                                        >
+                                        <div class="text-sm text-gray-700 select-none group-hover:text-gray-900 transition-colors ${task.completed ? 'line-through text-gray-400' : ''}">
+                                            ${task.type === 'theory' ? '<span class="font-bold text-xs uppercase tracking-wide text-gray-400 mr-1">Theory</span>' : ''}
+                                            ${task.text}
+                                        </div>
+                                    </label>
+                                `}).join('')}
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+                if (grid.innerHTML === '') {
+                    grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-400 italic">No tasks found for this filter.</div>`;
+                }
+            }
+        };
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+
+    </script>
+</body>
+</html>
