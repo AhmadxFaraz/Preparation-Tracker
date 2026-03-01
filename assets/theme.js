@@ -55,13 +55,19 @@
   }
 
   function createParticlesRenderer(canvas, ctx) {
+    const isCoarsePointer = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
     const particleCount = readNumber(canvas, 'particleCount', 130);
     const particleSize = readNumber(canvas, 'particleSize', 2.2);
     const particleSpeed = readNumber(canvas, 'particleSpeed', 1);
     const linkDistance = readNumber(canvas, 'linkDistance', 120);
-    const mouseRadius = readNumber(canvas, 'mouseRadius', 190);
-    const mouseForce = readNumber(canvas, 'mouseForce', 0.06);
-    const drag = readNumber(canvas, 'particleDrag', 0.985);
+    const baseMouseRadius = readNumber(canvas, 'mouseRadius', 190);
+    const baseMouseForce = readNumber(canvas, 'mouseForce', 0.06);
+    const baseDrag = readNumber(canvas, 'particleDrag', 0.985);
+
+    const effectiveParticleSpeed = isCoarsePointer ? particleSpeed * 0.72 : particleSpeed;
+    const mouseRadius = isCoarsePointer ? baseMouseRadius * 0.75 : baseMouseRadius;
+    const mouseForce = isCoarsePointer ? baseMouseForce * 0.35 : baseMouseForce;
+    const drag = isCoarsePointer ? Math.max(baseDrag, 0.992) : baseDrag;
 
     let particles = [];
     let mouseX = 0;
@@ -78,13 +84,33 @@
       mouseActive = false;
     });
 
+    window.addEventListener('touchstart', (event) => {
+      if (!event.touches || event.touches.length === 0) return;
+      mouseX = event.touches[0].clientX;
+      mouseY = event.touches[0].clientY;
+      mouseActive = true;
+    }, { passive: true });
+
+    window.addEventListener('touchmove', (event) => {
+      if (!event.touches || event.touches.length === 0) return;
+      mouseX = event.touches[0].clientX;
+      mouseY = event.touches[0].clientY;
+      mouseActive = true;
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => {
+      mouseActive = false;
+    }, { passive: true });
+
     return {
       reset(width, height) {
         particles = Array.from({ length: particleCount }, () => ({
           x: Math.random() * width,
           y: Math.random() * height,
-          vx: (Math.random() - 0.5) * particleSpeed,
-          vy: (Math.random() - 0.5) * particleSpeed
+          vx: (Math.random() - 0.5) * effectiveParticleSpeed,
+          vy: (Math.random() - 0.5) * effectiveParticleSpeed,
+          driftX: (Math.random() - 0.5) * effectiveParticleSpeed,
+          driftY: (Math.random() - 0.5) * effectiveParticleSpeed
         }));
       },
       draw(width, height) {
@@ -111,10 +137,14 @@
             }
           }
 
+          // Keep a permanent ambient drift so particles never freeze.
+          p.vx += (p.driftX - p.vx) * 0.02 + (Math.random() - 0.5) * 0.004;
+          p.vy += (p.driftY - p.vy) * 0.02 + (Math.random() - 0.5) * 0.004;
+
           p.vx *= drag;
           p.vy *= drag;
 
-          const maxSpeed = particleSpeed * 2.4;
+          const maxSpeed = effectiveParticleSpeed * (isCoarsePointer ? 1.8 : 2.4);
           const currentSpeed = Math.hypot(p.vx, p.vy);
           if (currentSpeed > maxSpeed) {
             p.vx = (p.vx / currentSpeed) * maxSpeed;
