@@ -24,8 +24,9 @@
 
   function initGlobalNavLinks() {
     if (!document.body) return;
+    const inAboutDir = /\/about\//.test(window.location.pathname || '');
 
-    if (!document.querySelector('[data-global-about-link]')) {
+    if (!inAboutDir && !document.querySelector('[data-global-about-link]')) {
       const aboutLink = document.createElement('a');
       aboutLink.href = getAboutHref();
       aboutLink.setAttribute('data-global-about-link', '1');
