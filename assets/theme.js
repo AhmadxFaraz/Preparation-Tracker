@@ -57,10 +57,26 @@
   function createParticlesRenderer(canvas, ctx) {
     const particleCount = readNumber(canvas, 'particleCount', 90);
     const particleSize = readNumber(canvas, 'particleSize', 2.2);
-    const particleSpeed = readNumber(canvas, 'particleSpeed', 0.5);
+    const particleSpeed = readNumber(canvas, 'particleSpeed', 0.7);
     const linkDistance = readNumber(canvas, 'linkDistance', 135);
+    const mouseRadius = readNumber(canvas, 'mouseRadius', 190);
+    const mouseForce = readNumber(canvas, 'mouseForce', 0.06);
+    const drag = readNumber(canvas, 'particleDrag', 0.985);
 
     let particles = [];
+    let mouseX = 0;
+    let mouseY = 0;
+    let mouseActive = false;
+
+    window.addEventListener('mousemove', (event) => {
+      mouseX = event.clientX;
+      mouseY = event.clientY;
+      mouseActive = true;
+    });
+
+    window.addEventListener('mouseleave', () => {
+      mouseActive = false;
+    });
 
     return {
       reset(width, height) {
@@ -83,6 +99,28 @@
 
         for (let i = 0; i < particleCount; i++) {
           const p = particles[i];
+
+          if (mouseActive) {
+            const dx = mouseX - p.x;
+            const dy = mouseY - p.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist > 0 && dist < mouseRadius) {
+              const pull = (1 - dist / mouseRadius) * mouseForce;
+              p.vx += (dx / dist) * pull;
+              p.vy += (dy / dist) * pull;
+            }
+          }
+
+          p.vx *= drag;
+          p.vy *= drag;
+
+          const maxSpeed = particleSpeed * 2.4;
+          const currentSpeed = Math.hypot(p.vx, p.vy);
+          if (currentSpeed > maxSpeed) {
+            p.vx = (p.vx / currentSpeed) * maxSpeed;
+            p.vy = (p.vy / currentSpeed) * maxSpeed;
+          }
+
           p.x += p.vx;
           p.y += p.vy;
 
