@@ -14,6 +14,36 @@
 
   window.ThemePalette = theme;
 
+  function getAboutHref() {
+    const path = window.location.pathname || '';
+    const inSubDir = /\/Applied-Mathematics-I\/|\/Applied-Mathematics-II\//.test(path);
+    return inSubDir ? '../about.html' : 'about.html';
+  }
+
+  function initGlobalNavLinks() {
+    if (!document.body) return;
+
+    if (!document.querySelector('[data-global-about-link]')) {
+      const aboutLink = document.createElement('a');
+      aboutLink.href = getAboutHref();
+      aboutLink.setAttribute('data-global-about-link', '1');
+      aboutLink.className = 'site-about-link mono';
+      aboutLink.textContent = 'About the Developer';
+      document.body.appendChild(aboutLink);
+    }
+
+    if (!document.querySelector('[data-global-github-link]')) {
+      const githubLink = document.createElement('a');
+      githubLink.href = 'https://github.com/AhmadxFaraz/Preparation-Tracker';
+      githubLink.target = '_blank';
+      githubLink.rel = 'noopener noreferrer';
+      githubLink.setAttribute('data-global-github-link', '1');
+      githubLink.className = 'site-github-link mono';
+      githubLink.textContent = 'View Project on GitHub';
+      document.body.appendChild(githubLink);
+    }
+  }
+
   function readNumber(canvas, key, fallback) {
     const raw = canvas.dataset[key];
     if (raw == null || raw === '') return fallback;
@@ -502,5 +532,6 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     initThemeBackground();
+    initGlobalNavLinks();
   });
 })();

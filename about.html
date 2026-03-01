@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About the Developer | Preparation-Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/theme.css?v=3" />
+</head>
+<body class="theme-page text-slate-100 min-h-screen">
+  <canvas id="bgCanvas" data-bg-mode="particles" data-particle-count="120" data-particle-size="2.8" data-particle-speed="1" data-link-distance="120"></canvas>
+
+  <main class="max-w-4xl mx-auto px-6 py-20">
+    <section class="animated-border p-8 md:p-10">
+      <p class="mono text-xs tracking-widest uppercase text-cyan-300">About</p>
+      <h1 class="mt-3 text-3xl md:text-4xl font-extrabold">About the Developer</h1>
+
+      <div class="mt-6 space-y-4 text-slate-300 leading-relaxed">
+        <p>
+          Hi, I am <span class="text-emerald-300 font-semibold">Ahmad Faraz</span>.
+          I built this Preparation-Tracker as a vibe coding project to blend engineering aesthetics with practical study tracking.
+        </p>
+        <p>
+          The goal was not only to track preparation, but to learn clean web development separation:
+          HTML for structure, CSS for design systems, and JavaScript for behavior, charts, storage, and cloud sync.
+        </p>
+        <p>
+          The current implementation focuses on AMS I and AMS II, and the same architecture is ready to expand into more math sections.
+        </p>
+      </div>
+
+      <div class="mt-8 grid gap-4 md:grid-cols-2">
+        <div class="card-hover p-5">
+          <h2 class="text-lg font-semibold text-cyan-300">Project Style</h2>
+          <p class="mt-2 text-sm text-slate-300">Math + coding vibe UI, particle background, and modular front-end architecture.</p>
+        </div>
+        <div class="card-hover p-5">
+          <h2 class="text-lg font-semibold text-emerald-300">Build Focus</h2>
+          <p class="mt-2 text-sm text-slate-300">Learning by building, with account-based sync so progress is available across devices.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/theme.js?v=3"></script>
+</body>
+</html>
