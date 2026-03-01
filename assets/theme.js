@@ -55,10 +55,10 @@
   }
 
   function createParticlesRenderer(canvas, ctx) {
-    const particleCount = readNumber(canvas, 'particleCount', 90);
+    const particleCount = readNumber(canvas, 'particleCount', 130);
     const particleSize = readNumber(canvas, 'particleSize', 2.2);
-    const particleSpeed = readNumber(canvas, 'particleSpeed', 0.7);
-    const linkDistance = readNumber(canvas, 'linkDistance', 135);
+    const particleSpeed = readNumber(canvas, 'particleSpeed', 1);
+    const linkDistance = readNumber(canvas, 'linkDistance', 120);
     const mouseRadius = readNumber(canvas, 'mouseRadius', 190);
     const mouseForce = readNumber(canvas, 'mouseForce', 0.06);
     const drag = readNumber(canvas, 'particleDrag', 0.985);
