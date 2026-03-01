@@ -33,12 +33,13 @@
     const motivator = document.getElementById('motivation-text');
     if (!motivator) return;
 
-    if (percent === 0) motivator.textContent = '"The journey of a thousand miles begins with a single step."';
-    else if (percent < 25) motivator.textContent = '"Great start! Keep the momentum going."';
-    else if (percent < 50) motivator.textContent = '"You are making solid progress. Don\'t stop now!"';
-    else if (percent < 75) motivator.textContent = '"Over halfway there! You\'re crushing it."';
-    else if (percent < 100) motivator.textContent = '"Almost done! Finish strong."';
-    else motivator.textContent = '"Congratulations! You are ready for the Exams."';
+    if (percent === 0) motivator.textContent = '"Structure begins before progress does."';
+    else if (percent < 20) motivator.textContent = '"Consistency matters more than intensity."';
+    else if (percent < 40) motivator.textContent = '"Understanding is building, piece by piece."';
+    else if (percent < 60) motivator.textContent = '"Momentum is now on your side."';
+    else if (percent < 80) motivator.textContent = '"Precision now. No careless gaps."';
+    else if (percent < 100) motivator.textContent = '"The finish line is in sight. Stay steady."';
+    else motivator.textContent = '"Prepared with clarity. Earn the result."';
   }
 
   function renderTasks(app) {
