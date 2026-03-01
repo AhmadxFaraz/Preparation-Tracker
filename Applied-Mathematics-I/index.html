@@ -14,7 +14,7 @@
 <canvas id="bgCanvas" data-bg-mode="particles" data-particle-count="120" data-particle-size="2.8" data-particle-speed="1" data-link-distance="120"></canvas>
 
 <header class="relative text-center py-16 px-4">
-  <a href="../login.html" class="absolute top-4 right-4 inline-block text-xs mono text-cyan-300 hover:text-cyan-200 border border-cyan-500/30 rounded-md px-3 py-1">
+  <a href="../login.html" class="absolute top-4 right-4 inline-block text-xs mono text-cyan-300 hover:text-cyan-200 border border-cyan-500/30 rounded-md px-3 py-1" data-auth-link data-default-label="Sign In / Sign Up">
     Sign In / Sign Up
   </a>
   <p class="mono text-xs md:text-sm text-cyan-300 tracking-widest uppercase">Course Track</p>
@@ -69,6 +69,11 @@
 </section>
 
 <script src="../assets/theme.js?v=2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/supabase-config.js"></script>
+<script src="../assets/js/supabase-client.js"></script>
+<script src="../assets/js/modules/header-auth.js"></script>
+<script>document.addEventListener("DOMContentLoaded",function(){window.HeaderAuth.initHeaderAuth();});</script>
 
 </body>
 </html>

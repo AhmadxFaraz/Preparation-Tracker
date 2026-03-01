@@ -106,9 +106,27 @@ with check (auth.uid() = user_id);
 ### 4) Use login page
 
 - Open `login.html`
-- Sign up / sign in
+- If new user: open `signup.html` and create account
+- Then sign in via `login.html`
 - Open any unit page and progress will sync to cloud automatically
 - On a new device: sign in and your saved progress is restored
+
+### 5) Header account label
+
+- Top-right `Sign In / Sign Up` label on dashboard/course pages auto-updates to user name after login.
+- Name priority:
+  1. `full_name` from signup metadata
+  2. email prefix (before `@`) fallback
+
+### 6) Account-bound progress behavior
+
+- Progress is saved per `user_id + unit storage_key` in cloud (`tracker_progress` table).
+- This means each unit keeps its own independent saved state in your account.
+- Example:
+  - Completing 3 topics in AMS-I Unit-2 saves only that unit's state.
+  - Logging in from another device restores the same AMS-I Unit-2 state.
+- Clearing browser history/cache does not delete cloud progress.
+- Progress changes only if user updates tasks or presses Reset.
 
 ## 3) How data flows for each action
 

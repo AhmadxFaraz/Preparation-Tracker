@@ -3,13 +3,17 @@
     return JSON.parse(JSON.stringify(value));
   }
 
-  function load(storageKey, seedData) {
+  function read(storageKey) {
     try {
-      const saved = JSON.parse(localStorage.getItem(storageKey));
-      if (saved) return saved;
+      return JSON.parse(localStorage.getItem(storageKey));
     } catch (_) {
-      // Fall back to default data if local storage is malformed.
+      return null;
     }
+  }
+
+  function load(storageKey, seedData) {
+    const saved = read(storageKey);
+    if (saved) return saved;
     return deepCopy(seedData);
   }
 
@@ -19,6 +23,7 @@
 
   window.TrackerStorage = {
     deepCopy,
+    read,
     load,
     save
   };

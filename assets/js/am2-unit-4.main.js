@@ -1,6 +1,7 @@
 const app = window.createStudyTrackerApp({
   studyData,
-  storageKey: 'ams1120_unit4_data'
+  storageKey: 'ams1122_unit4_data',
+  fallbackStorageKeys: ['ams1120_unit4_data']
 });
 
 window.app = app;
