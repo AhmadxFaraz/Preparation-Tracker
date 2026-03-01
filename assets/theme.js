@@ -1,15 +1,15 @@
 (function () {
   const theme = {
-    bg: '#050b14',
-    surface: '#0f1a2b',
-    cyan: '#22d3ee',
-    emerald: '#34d399',
-    border: '#334155',
-    textSoft: '#cbd5e1',
-    textMuted: '#94a3b8',
-    grid: 'rgba(148,163,184,0.15)',
-    amber: '#f59e0b',
-    line: 'rgba(34,211,238,0.15)'
+    bg: '#020202',
+    surface: '#0d0d0d',
+    cyan: '#ffffff',
+    emerald: '#f5f5f5',
+    border: 'rgba(255,255,255,0.2)',
+    textSoft: '#e5e7eb',
+    textMuted: '#9ca3af',
+    grid: 'rgba(255,255,255,0.08)',
+    amber: '#d1d5db',
+    line: 'rgba(255,255,255,0.18)'
   };
 
   window.ThemePalette = theme;
@@ -72,6 +72,12 @@
         ctx.fillStyle = theme.bg;
         ctx.fillRect(0, 0, width, height);
 
+        const glow = ctx.createRadialGradient(width * 0.5, height * 0.45, 0, width * 0.5, height * 0.45, Math.max(width, height) * 0.65);
+        glow.addColorStop(0, 'rgba(255,255,255,0.05)');
+        glow.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, width, height);
+
         for (let i = 0; i < particleCount; i++) {
           const p = particles[i];
           p.x += p.vx;
@@ -82,7 +88,7 @@
           if (p.y < 0) p.y = height;
           if (p.y > height) p.y = 0;
 
-          ctx.fillStyle = theme.emerald;
+          ctx.fillStyle = i % 10 === 0 ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.72)';
           ctx.beginPath();
           ctx.arc(p.x, p.y, particleSize, 0, Math.PI * 2);
           ctx.fill();
@@ -91,7 +97,8 @@
             const p2 = particles[j];
             const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
             if (dist < linkDistance) {
-              ctx.strokeStyle = theme.line;
+              const alpha = (1 - dist / linkDistance) * 0.22;
+              ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
               ctx.beginPath();
               ctx.moveTo(p.x, p.y);
               ctx.lineTo(p2.x, p2.y);
