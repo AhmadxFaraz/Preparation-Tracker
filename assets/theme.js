@@ -52,10 +52,10 @@
   }
 
   function createParticlesRenderer(canvas, ctx) {
-    const particleCount = readNumber(canvas, 'particleCount', 120);
-    const particleSize = readNumber(canvas, 'particleSize', 2.8);
-    const particleSpeed = readNumber(canvas, 'particleSpeed', 1);
-    const linkDistance = readNumber(canvas, 'linkDistance', 120);
+    const particleCount = readNumber(canvas, 'particleCount', 90);
+    const particleSize = readNumber(canvas, 'particleSize', 2.2);
+    const particleSpeed = readNumber(canvas, 'particleSpeed', 0.5);
+    const linkDistance = readNumber(canvas, 'linkDistance', 135);
 
     let particles = [];
 
@@ -88,7 +88,7 @@
           if (p.y < 0) p.y = height;
           if (p.y > height) p.y = 0;
 
-          ctx.fillStyle = i % 10 === 0 ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.72)';
+          ctx.fillStyle = i % 12 === 0 ? 'rgba(255,255,255,0.78)' : 'rgba(255,255,255,0.56)';
           ctx.beginPath();
           ctx.arc(p.x, p.y, particleSize, 0, Math.PI * 2);
           ctx.fill();
@@ -97,7 +97,7 @@
             const p2 = particles[j];
             const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
             if (dist < linkDistance) {
-              const alpha = (1 - dist / linkDistance) * 0.22;
+              const alpha = (1 - dist / linkDistance) * 0.14;
               ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
               ctx.beginPath();
               ctx.moveTo(p.x, p.y);
