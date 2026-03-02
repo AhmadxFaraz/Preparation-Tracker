@@ -139,7 +139,7 @@
 }
 
 .task-checkbox {
-  accent-color: var(--theme-emerald);
+  accent-color: #3b82f6;
 }
 
 .task-checkbox:checked + div {
