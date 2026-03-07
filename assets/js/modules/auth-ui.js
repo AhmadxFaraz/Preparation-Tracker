@@ -1,4 +1,6 @@
 (function () {
+  const MIN_PASSWORD_LENGTH = 6;
+
   function normalizeError(err) {
     if (!err) return 'Unknown error.';
     if (typeof err === 'string') return err;
@@ -8,6 +10,63 @@
     } catch (_) {
       return 'Unknown error.';
     }
+  }
+
+  function mapAuthError(err, context) {
+    const raw = normalizeError(err);
+    const message = raw.toLowerCase();
+    const code = String((err && (err.code || err.error_code || err.status)) || '').toLowerCase();
+
+    if (message.includes('invalid login credentials') || message.includes('invalid credentials')) {
+      return 'Incorrect email or password. Please try again.';
+    }
+
+    if (message.includes('password should be at least') || message.includes('weak password') || code === 'weak_password') {
+      return `Password is too weak. Use at least ${MIN_PASSWORD_LENGTH} characters.`;
+    }
+
+    if (
+      message.includes('expired') ||
+      message.includes('otp') ||
+      message.includes('token') ||
+      message.includes('recovery link') ||
+      code === 'otp_expired' ||
+      code === 'otp_disabled' ||
+      code === 'invalid_grant'
+    ) {
+      return 'This reset link is invalid or expired. Request a new password reset link.';
+    }
+
+    if (
+      message.includes('redirect') ||
+      message.includes('redirect_to') ||
+      message.includes('not allowed') ||
+      message.includes('site url')
+    ) {
+      return 'Auth redirect is not configured correctly. Update Site URL and Redirect URLs in Supabase settings.';
+    }
+
+    if (message.includes('rate limit') || message.includes('too many requests') || code === '429') {
+      return 'Too many attempts right now. Please wait a moment and try again.';
+    }
+
+    if (message.includes('failed to fetch') || message.includes('network') || message.includes('timeout')) {
+      return 'Network issue detected. Check your internet connection and retry.';
+    }
+
+    if (context === 'reset-email') {
+      return 'Could not send reset link. Please verify the email and try again.';
+    }
+
+    if (context === 'signup') {
+      return 'Could not create account right now. Please try again.';
+    }
+
+    if (context === 'update-password') {
+      return 'Could not update password. Try again or request a new reset link.';
+    }
+
+    return 'Something went wrong. Please try again.';
   }
 
   function setStatus(text, isError) {
@@ -51,7 +110,82 @@
     });
   }
 
-  async function refreshUserView() {
+  function parseAuthParams() {
+    const hash = String(window.location.hash || '').replace(/^#/, '');
+    const hashParams = new URLSearchParams(hash);
+    const queryParams = new URLSearchParams(window.location.search || '');
+
+    return {
+      type: hashParams.get('type') || queryParams.get('type') || '',
+      accessToken: hashParams.get('access_token') || queryParams.get('access_token') || '',
+      recoveryToken: hashParams.get('recovery_token') || queryParams.get('recovery_token') || '',
+      error: hashParams.get('error') || queryParams.get('error') || '',
+      errorCode: hashParams.get('error_code') || queryParams.get('error_code') || '',
+      errorDescription: hashParams.get('error_description') || queryParams.get('error_description') || '',
+      notice: queryParams.get('notice') || ''
+    };
+  }
+
+  function safeDecode(value) {
+    if (!value) return '';
+    try {
+      return decodeURIComponent(value);
+    } catch (_) {
+      return value;
+    }
+  }
+
+  function hasRecoveryHint(params) {
+    return params.type === 'recovery' || Boolean(params.accessToken || params.recoveryToken);
+  }
+
+  function getStatusFromNotice(params) {
+    if (params.notice === 'login_required') {
+      return {
+        text: 'Please sign in to access account security settings.',
+        isError: true
+      };
+    }
+
+    if (params.notice === 'password_changed') {
+      return {
+        text: 'Password changed successfully. Please sign in with your new password.',
+        isError: false
+      };
+    }
+
+    return null;
+  }
+
+  async function getCurrentUser(client) {
+    if (window.TrackerCloud && typeof window.TrackerCloud.getUser === 'function') {
+      return window.TrackerCloud.getUser();
+    }
+
+    const { data } = await client.auth.getUser();
+    return data && data.user ? data.user : null;
+  }
+
+  function sleep(ms) {
+    return new Promise(function (resolve) {
+      window.setTimeout(resolve, ms);
+    });
+  }
+
+  async function waitForRecoveryUser(client, attempts, intervalMs) {
+    let index = 0;
+    while (index < attempts) {
+      const user = await getCurrentUser(client);
+      if (user) return user;
+      index += 1;
+      if (index < attempts) {
+        await sleep(intervalMs);
+      }
+    }
+    return null;
+  }
+
+  async function refreshUserView(client) {
     const userBox = document.getElementById('auth-user');
     const actions = document.getElementById('auth-actions');
     const form = document.getElementById('auth-form');
@@ -59,7 +193,7 @@
 
     if (!userBox || !actions || !form) return;
 
-    const user = await window.TrackerCloud.getUser();
+    const user = await getCurrentUser(client);
     if (user) {
       userBox.textContent = `Logged in as: ${getDisplayName(user)} (${user.email})`;
       actions.classList.remove('hidden');
@@ -70,6 +204,24 @@
       actions.classList.add('hidden');
       form.classList.remove('hidden');
       if (switchLink) switchLink.classList.remove('hidden');
+    }
+  }
+
+  function setButtonsBusy(buttons, isBusy) {
+    buttons.forEach(function (btn) {
+      if (!btn) return;
+      btn.disabled = isBusy;
+      btn.classList.toggle('opacity-70', isBusy);
+      btn.classList.toggle('cursor-not-allowed', isBusy);
+    });
+  }
+
+  async function runWithBusy(buttons, action) {
+    setButtonsBusy(buttons, true);
+    try {
+      return await action();
+    } finally {
+      setButtonsBusy(buttons, false);
     }
   }
 
@@ -96,7 +248,8 @@
 
   async function signOut() {
     const client = window.SupabaseClient.getClient();
-    await client.auth.signOut();
+    const { error } = await client.auth.signOut();
+    if (error) throw error;
   }
 
   async function sendPasswordResetEmail(email) {
@@ -110,7 +263,6 @@
     const explicit = String(window.SUPABASE_AUTH_REDIRECT_URL || '').trim();
     if (explicit) return explicit;
 
-    // Fallback: keep reset flow on this app's login page even in subdirectories.
     try {
       return new URL('login.html', window.location.href).toString();
     } catch (_) {
@@ -130,24 +282,34 @@
     if (error) throw error;
   }
 
-  function isRecoveryModeFromUrl() {
-    const hash = String(window.location.hash || '').replace(/^#/, '');
-    const hashParams = new URLSearchParams(hash);
-    if (hashParams.get('type') === 'recovery') return true;
-
-    const searchParams = new URLSearchParams(window.location.search || '');
-    return searchParams.get('type') === 'recovery';
-  }
-
   function validateCredentials(email, password) {
     if (!email || !password) {
       setStatus('Email and password are required.', true);
       return false;
     }
-    if (password.length < 6) {
-      setStatus('Password must be at least 6 characters.', true);
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      setStatus(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`, true);
       return false;
     }
+    return true;
+  }
+
+  function validateNewPasswordInputs(newPassword, confirmPassword) {
+    if (!newPassword || !confirmPassword) {
+      setStatus('Both password fields are required.', true);
+      return false;
+    }
+
+    if (newPassword.length < MIN_PASSWORD_LENGTH) {
+      setStatus(`New password must be at least ${MIN_PASSWORD_LENGTH} characters.`, true);
+      return false;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setStatus('Passwords do not match.', true);
+      return false;
+    }
+
     return true;
   }
 
@@ -164,9 +326,12 @@
     const signOutBtn = document.getElementById('signout-btn');
     const userBox = document.getElementById('auth-user');
     const switchLink = document.getElementById('switch-auth-link');
-    let recoveryMode = isRecoveryModeFromUrl();
 
     if (!form || !recoveryForm || !signInBtn || !forgotPasswordBtn || !updatePasswordBtn || !signOutBtn) return;
+
+    const authParams = parseAuthParams();
+    const recoveryHint = hasRecoveryHint(authParams);
+    let recoveryMode = false;
 
     function setLoginModeUi() {
       recoveryMode = false;
@@ -185,23 +350,25 @@
     }
 
     async function submitSignIn() {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
+      const email = (document.getElementById('email') || { value: '' }).value.trim();
+      const password = (document.getElementById('password') || { value: '' }).value;
       if (!validateCredentials(email, password)) return;
 
       try {
-        setStatus('Processing...');
-        await signIn(email, password);
+        setStatus('Signing in...');
+        await runWithBusy([signInBtn, forgotPasswordBtn], function () {
+          return signIn(email, password);
+        });
         setStatus('Signed in successfully.');
-        await refreshUserView();
+        await refreshUserView(client);
       } catch (err) {
         console.error('Sign in error:', err);
-        setStatus(`Auth failed: ${normalizeError(err)}`, true);
+        setStatus(mapAuthError(err, 'signin'), true);
       }
     }
 
     async function submitForgotPassword() {
-      const email = document.getElementById('email').value.trim();
+      const email = (document.getElementById('email') || { value: '' }).value.trim();
       if (!email) {
         setStatus('Enter your email first, then click Forgot Password.', true);
         return;
@@ -209,11 +376,13 @@
 
       try {
         setStatus('Sending reset link...');
-        await sendPasswordResetEmail(email);
+        await runWithBusy([forgotPasswordBtn, signInBtn], function () {
+          return sendPasswordResetEmail(email);
+        });
         setStatus('Password reset link sent. Check your email inbox.');
       } catch (err) {
         console.error('Forgot password error:', err);
-        setStatus(`Reset failed: ${normalizeError(err)}`, true);
+        setStatus(mapAuthError(err, 'reset-email'), true);
       }
     }
 
@@ -221,31 +390,21 @@
       const newPassword = (document.getElementById('new-password') || { value: '' }).value;
       const confirmPassword = (document.getElementById('confirm-password') || { value: '' }).value;
 
-      if (!newPassword || !confirmPassword) {
-        setStatus('Both password fields are required.', true);
-        return;
-      }
-      if (newPassword.length < 6) {
-        setStatus('New password must be at least 6 characters.', true);
-        return;
-      }
-      if (newPassword !== confirmPassword) {
-        setStatus('Passwords do not match.', true);
-        return;
-      }
+      if (!validateNewPasswordInputs(newPassword, confirmPassword)) return;
 
       try {
         setStatus('Updating password...');
-        await updatePassword(newPassword);
+        await runWithBusy([updatePasswordBtn], function () {
+          return updatePassword(newPassword);
+        });
         await signOut();
 
-        // Clear hash/query so refresh returns to normal sign-in mode.
-        window.history.replaceState({}, document.title, window.location.pathname);
+        window.history.replaceState({}, document.title, window.location.pathname + '?notice=password_changed');
         setLoginModeUi();
-        setStatus('Password updated. Sign in with your new password.');
+        setStatus('Password changed successfully. Please sign in with your new password.');
       } catch (err) {
         console.error('Update password error:', err);
-        setStatus(`Password update failed: ${normalizeError(err)}`, true);
+        setStatus(mapAuthError(err, 'update-password'), true);
       }
     }
 
@@ -258,25 +417,54 @@
     });
 
     signOutBtn.addEventListener('click', async function () {
-      await signOut();
-      setStatus('Signed out.');
-      await refreshUserView();
+      try {
+        await signOut();
+        setStatus('Signed out.');
+        await refreshUserView(client);
+      } catch (err) {
+        console.error('Sign out error:', err);
+        setStatus(mapAuthError(err, 'signout'), true);
+      }
     });
 
     client.auth.onAuthStateChange(function () {
       if (recoveryMode) {
         setRecoveryModeUi();
       } else {
-        refreshUserView();
+        refreshUserView(client);
       }
     });
 
-    if (recoveryMode) {
-      setRecoveryModeUi();
-      setStatus('Recovery link verified. Set your new password.');
-    } else {
+    if (authParams.error || authParams.errorCode || authParams.errorDescription) {
+      const errorObject = {
+        message: safeDecode(authParams.errorDescription || authParams.error || authParams.errorCode)
+      };
+      setStatus(mapAuthError(errorObject, 'recovery'), true);
       setLoginModeUi();
-      refreshUserView();
+      return;
+    }
+
+    const noticeStatus = getStatusFromNotice(authParams);
+
+    if (recoveryHint) {
+      const user = await waitForRecoveryUser(client, 3, 350);
+      if (user) {
+        setRecoveryModeUi();
+        setStatus('Recovery link verified. Set your new password.');
+      } else {
+        setLoginModeUi();
+        setStatus(
+          'This reset link is invalid or expired. Enter your email and request a new reset link. If this keeps happening, verify redirect URLs in Supabase Auth settings.',
+          true
+        );
+      }
+      return;
+    }
+
+    setLoginModeUi();
+    await refreshUserView(client);
+    if (noticeStatus) {
+      setStatus(noticeStatus.text, noticeStatus.isError);
     }
   }
 
@@ -293,14 +481,16 @@
 
     async function submitSignUp() {
       const fullName = (document.getElementById('full-name') || { value: '' }).value.trim();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
+      const email = (document.getElementById('email') || { value: '' }).value.trim();
+      const password = (document.getElementById('password') || { value: '' }).value;
 
       if (!validateCredentials(email, password)) return;
 
       try {
         setStatus('Creating account...');
-        const result = await signUp(fullName, email, password);
+        const result = await runWithBusy([signUpBtn], function () {
+          return signUp(fullName, email, password);
+        });
 
         if (result && !result.session) {
           setStatus('Sign-up successful. Check your email to confirm, then sign in.');
@@ -308,10 +498,10 @@
           setStatus('Sign-up successful and logged in.');
         }
 
-        await refreshUserView();
+        await refreshUserView(client);
       } catch (err) {
         console.error('Sign up error:', err);
-        setStatus(`Auth failed: ${normalizeError(err)}`, true);
+        setStatus(mapAuthError(err, 'signup'), true);
       }
     }
 
@@ -322,21 +512,84 @@
     });
 
     signOutBtn.addEventListener('click', async function () {
-      await signOut();
-      setStatus('Signed out.');
-      await refreshUserView();
+      try {
+        await signOut();
+        setStatus('Signed out.');
+        await refreshUserView(client);
+      } catch (err) {
+        console.error('Sign out error:', err);
+        setStatus(mapAuthError(err, 'signout'), true);
+      }
     });
 
     client.auth.onAuthStateChange(function () {
-      refreshUserView();
+      refreshUserView(client);
     });
 
-    refreshUserView();
+    refreshUserView(client);
+  }
+
+  async function initAccountSecurityPage() {
+    const client = getClientOrStatus();
+    wireShowPassword();
+    if (!client) return;
+
+    const userBox = document.getElementById('auth-user');
+    const updatePasswordBtn = document.getElementById('update-password-btn');
+    const signOutBtn = document.getElementById('signout-btn');
+    const securityForm = document.getElementById('security-form');
+
+    if (!userBox || !updatePasswordBtn || !signOutBtn || !securityForm) return;
+
+    const user = await getCurrentUser(client);
+    if (!user) {
+      window.location.href = 'login.html?notice=login_required';
+      return;
+    }
+
+    userBox.textContent = `Logged in as: ${getDisplayName(user)} (${user.email})`;
+
+    async function submitPasswordUpdate() {
+      const newPassword = (document.getElementById('new-password') || { value: '' }).value;
+      const confirmPassword = (document.getElementById('confirm-password') || { value: '' }).value;
+
+      if (!validateNewPasswordInputs(newPassword, confirmPassword)) return;
+
+      try {
+        setStatus('Updating password...');
+        await runWithBusy([updatePasswordBtn], function () {
+          return updatePassword(newPassword);
+        });
+        await signOut();
+        window.location.href = 'login.html?notice=password_changed';
+      } catch (err) {
+        console.error('Account security password update error:', err);
+        setStatus(mapAuthError(err, 'update-password'), true);
+      }
+    }
+
+    updatePasswordBtn.addEventListener('click', submitPasswordUpdate);
+    securityForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      submitPasswordUpdate();
+    });
+
+    signOutBtn.addEventListener('click', async function () {
+      try {
+        await signOut();
+        window.location.href = 'login.html';
+      } catch (err) {
+        console.error('Sign out error:', err);
+        setStatus(mapAuthError(err, 'signout'), true);
+      }
+    });
   }
 
   window.AuthUI = {
     initLoginPage,
     initSignupPage,
-    getDisplayName
+    initAccountSecurityPage,
+    getDisplayName,
+    mapAuthError
   };
 })();

@@ -70,6 +70,17 @@ Set:
 - `window.SUPABASE_URL`
 - `window.SUPABASE_ANON_KEY`
 
+### Supabase Auth URL settings (required for reset flow)
+
+In Supabase Dashboard -> Authentication -> URL Configuration:
+
+- `Site URL` should match your deployed app base URL  
+  Example: `https://ahmadxfaraz.github.io/Project-Eigen/`
+- `Additional Redirect URLs` must include your auth callback pages:
+  - `https://ahmadxfaraz.github.io/Project-Eigen/login.html`
+  - `https://ahmadxfaraz.github.io/Project-Eigen/account-security.html`
+  - `http://localhost:3000/login.html` (if testing locally)
+
 ### SQL: table + RLS policies
 
 ```sql

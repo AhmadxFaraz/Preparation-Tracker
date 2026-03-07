@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign In | Preparation Tracker</title>
+  <title>Account Security | Preparation Tracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/theme.css?v=5" />
@@ -13,28 +13,12 @@
 
   <main class="animated-border max-w-md w-full p-7">
     <p class="mono text-xs text-cyan-300 tracking-widest uppercase">Account</p>
-    <h1 class="text-3xl font-extrabold mt-2">Sign In</h1>
-    <p class="text-slate-300 mt-3 text-sm">Sign in to sync your preparation progress across devices.</p>
+    <h1 class="text-3xl font-extrabold mt-2">Security Settings</h1>
+    <p class="text-slate-300 mt-3 text-sm">Change your password while signed in.</p>
 
     <div id="auth-user" class="mt-4 text-sm text-slate-300">Checking session...</div>
 
-    <form id="auth-form" class="mt-4 space-y-3">
-      <input id="email" type="email" placeholder="Email" class="w-full rounded-lg bg-slate-900/70 border border-slate-700 px-3 py-2 text-sm outline-none focus:border-cyan-400" />
-      <input id="password" type="password" placeholder="Password" class="w-full rounded-lg bg-slate-900/70 border border-slate-700 px-3 py-2 text-sm outline-none focus:border-cyan-400" />
-
-      <label class="inline-flex items-center gap-2 text-xs text-slate-300">
-        <input type="checkbox" data-toggle-password data-target="password" class="rounded border-slate-600 bg-slate-800" />
-        Show password
-      </label>
-
-      <button id="signin-btn" type="button" class="w-full rounded-lg bg-cyan-500/20 text-cyan-300 px-3 py-2 text-sm font-semibold">Sign In</button>
-      <button id="forgot-password-btn" type="button" class="w-full rounded-lg bg-white/10 text-slate-200 px-3 py-2 text-sm font-medium border border-white/20">
-        Forgot Password
-      </button>
-    </form>
-
-    <form id="recovery-form" class="hidden mt-4 space-y-3">
-      <p class="text-xs text-slate-300">Set a new password for your account.</p>
+    <form id="security-form" class="mt-4 space-y-3">
       <input id="new-password" type="password" placeholder="New Password" class="w-full rounded-lg bg-slate-900/70 border border-slate-700 px-3 py-2 text-sm outline-none focus:border-cyan-400" />
       <input id="confirm-password" type="password" placeholder="Confirm New Password" class="w-full rounded-lg bg-slate-900/70 border border-slate-700 px-3 py-2 text-sm outline-none focus:border-cyan-400" />
 
@@ -53,16 +37,11 @@
       </button>
     </form>
 
-    <div id="auth-actions" class="hidden mt-4">
+    <div class="mt-4">
       <button id="signout-btn" type="button" class="w-full rounded-lg bg-amber-500/20 text-amber-300 px-3 py-2 text-sm font-semibold">Sign Out</button>
     </div>
 
     <div id="auth-status" class="text-slate-400 text-sm mt-3"></div>
-
-    <div id="switch-auth-link" class="mt-4 text-sm text-slate-300">
-      New here?
-      <a href="signup.html" class="text-emerald-300 hover:text-emerald-200">Create an account</a>
-    </div>
 
     <a href="index.html" class="inline-block mt-6 text-xs mono text-cyan-300 hover:text-cyan-200">← Back to Dashboard</a>
   </main>
@@ -71,11 +50,10 @@
   <script src="assets/theme.js?v=4"></script>
   <script src="assets/js/supabase-config.js"></script>
   <script src="assets/js/supabase-client.js?v=7"></script>
-  <script src="assets/js/modules/cloud-sync.js?v=7"></script>
   <script src="assets/js/modules/auth-ui.js?v=2"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      window.AuthUI.initLoginPage();
+      window.AuthUI.initAccountSecurityPage();
     });
   </script>
 </body>

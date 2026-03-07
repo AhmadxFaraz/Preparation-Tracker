@@ -21,8 +21,18 @@
     const user = await getUser();
     links.forEach(function (link) {
       const defaultLabel = link.getAttribute('data-default-label') || 'Sign In / Sign Up';
+      const storedDefaultHref = link.getAttribute('data-default-href');
+      const currentHref = link.getAttribute('href') || 'login.html';
+      const defaultHref = storedDefaultHref || currentHref;
+      if (!storedDefaultHref) {
+        link.setAttribute('data-default-href', defaultHref);
+      }
+      const signedInHref = defaultHref.includes('login.html')
+        ? defaultHref.replace('login.html', 'account-security.html')
+        : defaultHref;
       link.textContent = user ? getDisplayName(user) : defaultLabel;
       link.title = user ? `Logged in as ${user.email}` : defaultLabel;
+      link.setAttribute('href', user ? signedInHref : defaultHref);
     });
   }
 
