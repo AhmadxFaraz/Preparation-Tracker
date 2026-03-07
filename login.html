@@ -28,6 +28,29 @@
       </label>
 
       <button id="signin-btn" type="button" class="w-full rounded-lg bg-cyan-500/20 text-cyan-300 px-3 py-2 text-sm font-semibold">Sign In</button>
+      <button id="forgot-password-btn" type="button" class="w-full rounded-lg bg-white/10 text-slate-200 px-3 py-2 text-sm font-medium border border-white/20">
+        Forgot Password
+      </button>
+    </form>
+
+    <form id="recovery-form" class="hidden mt-4 space-y-3">
+      <p class="text-xs text-slate-300">Set a new password for your account.</p>
+      <input id="new-password" type="password" placeholder="New Password" class="w-full rounded-lg bg-slate-900/70 border border-slate-700 px-3 py-2 text-sm outline-none focus:border-cyan-400" />
+      <input id="confirm-password" type="password" placeholder="Confirm New Password" class="w-full rounded-lg bg-slate-900/70 border border-slate-700 px-3 py-2 text-sm outline-none focus:border-cyan-400" />
+
+      <label class="inline-flex items-center gap-2 text-xs text-slate-300">
+        <input type="checkbox" data-toggle-password data-target="new-password" class="rounded border-slate-600 bg-slate-800" />
+        Show new password
+      </label>
+
+      <label class="inline-flex items-center gap-2 text-xs text-slate-300">
+        <input type="checkbox" data-toggle-password data-target="confirm-password" class="rounded border-slate-600 bg-slate-800" />
+        Show confirm password
+      </label>
+
+      <button id="update-password-btn" type="button" class="w-full rounded-lg bg-cyan-500/20 text-cyan-300 px-3 py-2 text-sm font-semibold">
+        Update Password
+      </button>
     </form>
 
     <div id="auth-actions" class="hidden mt-4">

@@ -97,6 +97,28 @@
     await client.auth.signOut();
   }
 
+  async function sendPasswordResetEmail(email) {
+    const client = window.SupabaseClient.getClient();
+    const redirectTo = `${window.location.origin}${window.location.pathname}`;
+    const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo });
+    if (error) throw error;
+  }
+
+  async function updatePassword(newPassword) {
+    const client = window.SupabaseClient.getClient();
+    const { error } = await client.auth.updateUser({ password: newPassword });
+    if (error) throw error;
+  }
+
+  function isRecoveryModeFromUrl() {
+    const hash = String(window.location.hash || '').replace(/^#/, '');
+    const hashParams = new URLSearchParams(hash);
+    if (hashParams.get('type') === 'recovery') return true;
+
+    const searchParams = new URLSearchParams(window.location.search || '');
+    return searchParams.get('type') === 'recovery';
+  }
+
   function validateCredentials(email, password) {
     if (!email || !password) {
       setStatus('Email and password are required.', true);
@@ -115,10 +137,32 @@
     if (!client) return;
 
     const form = document.getElementById('auth-form');
+    const recoveryForm = document.getElementById('recovery-form');
     const signInBtn = document.getElementById('signin-btn');
+    const forgotPasswordBtn = document.getElementById('forgot-password-btn');
+    const updatePasswordBtn = document.getElementById('update-password-btn');
     const signOutBtn = document.getElementById('signout-btn');
+    const userBox = document.getElementById('auth-user');
+    const switchLink = document.getElementById('switch-auth-link');
+    let recoveryMode = isRecoveryModeFromUrl();
 
-    if (!form || !signInBtn || !signOutBtn) return;
+    if (!form || !recoveryForm || !signInBtn || !forgotPasswordBtn || !updatePasswordBtn || !signOutBtn) return;
+
+    function setLoginModeUi() {
+      recoveryMode = false;
+      form.classList.remove('hidden');
+      recoveryForm.classList.add('hidden');
+      if (switchLink) switchLink.classList.remove('hidden');
+      if (userBox) userBox.textContent = 'Not logged in';
+    }
+
+    function setRecoveryModeUi() {
+      recoveryMode = true;
+      form.classList.add('hidden');
+      recoveryForm.classList.remove('hidden');
+      if (switchLink) switchLink.classList.add('hidden');
+      if (userBox) userBox.textContent = 'Password recovery mode';
+    }
 
     async function submitSignIn() {
       const email = document.getElementById('email').value.trim();
@@ -136,7 +180,58 @@
       }
     }
 
+    async function submitForgotPassword() {
+      const email = document.getElementById('email').value.trim();
+      if (!email) {
+        setStatus('Enter your email first, then click Forgot Password.', true);
+        return;
+      }
+
+      try {
+        setStatus('Sending reset link...');
+        await sendPasswordResetEmail(email);
+        setStatus('Password reset link sent. Check your email inbox.');
+      } catch (err) {
+        console.error('Forgot password error:', err);
+        setStatus(`Reset failed: ${normalizeError(err)}`, true);
+      }
+    }
+
+    async function submitPasswordUpdate() {
+      const newPassword = (document.getElementById('new-password') || { value: '' }).value;
+      const confirmPassword = (document.getElementById('confirm-password') || { value: '' }).value;
+
+      if (!newPassword || !confirmPassword) {
+        setStatus('Both password fields are required.', true);
+        return;
+      }
+      if (newPassword.length < 6) {
+        setStatus('New password must be at least 6 characters.', true);
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        setStatus('Passwords do not match.', true);
+        return;
+      }
+
+      try {
+        setStatus('Updating password...');
+        await updatePassword(newPassword);
+        await signOut();
+
+        // Clear hash/query so refresh returns to normal sign-in mode.
+        window.history.replaceState({}, document.title, window.location.pathname);
+        setLoginModeUi();
+        setStatus('Password updated. Sign in with your new password.');
+      } catch (err) {
+        console.error('Update password error:', err);
+        setStatus(`Password update failed: ${normalizeError(err)}`, true);
+      }
+    }
+
     signInBtn.addEventListener('click', submitSignIn);
+    forgotPasswordBtn.addEventListener('click', submitForgotPassword);
+    updatePasswordBtn.addEventListener('click', submitPasswordUpdate);
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       submitSignIn();
@@ -149,10 +244,20 @@
     });
 
     client.auth.onAuthStateChange(function () {
-      refreshUserView();
+      if (recoveryMode) {
+        setRecoveryModeUi();
+      } else {
+        refreshUserView();
+      }
     });
 
-    refreshUserView();
+    if (recoveryMode) {
+      setRecoveryModeUi();
+      setStatus('Recovery link verified. Set your new password.');
+    } else {
+      setLoginModeUi();
+      refreshUserView();
+    }
   }
 
   async function initSignupPage() {

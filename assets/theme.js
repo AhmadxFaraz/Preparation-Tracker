@@ -63,6 +63,9 @@
     const baseMouseRadius = readNumber(canvas, 'mouseRadius', 190);
     const baseMouseForce = readNumber(canvas, 'mouseForce', 0.06);
     const baseDrag = readNumber(canvas, 'particleDrag', 0.985);
+    const particleColor = canvas.dataset.particleColor || 'rgba(0,240,255,0.20)';
+    const particleColorStrong = canvas.dataset.particleColorStrong || 'rgba(0,240,255,0.38)';
+    const linkColorRgb = canvas.dataset.linkColorRgb || '0,240,255';
 
     const effectiveParticleSpeed = isCoarsePointer ? particleSpeed * 0.72 : particleSpeed;
     const mouseRadius = isCoarsePointer ? baseMouseRadius * 0.75 : baseMouseRadius;
@@ -159,7 +162,7 @@
           if (p.y < 0) p.y = height;
           if (p.y > height) p.y = 0;
 
-          ctx.fillStyle = i % 12 === 0 ? 'rgba(255,255,255,0.78)' : 'rgba(255,255,255,0.56)';
+          ctx.fillStyle = i % 12 === 0 ? particleColorStrong : particleColor;
           ctx.beginPath();
           ctx.arc(p.x, p.y, particleSize, 0, Math.PI * 2);
           ctx.fill();
@@ -169,7 +172,7 @@
             const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
             if (dist < linkDistance) {
               const alpha = (1 - dist / linkDistance) * 0.14;
-              ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+              ctx.strokeStyle = `rgba(${linkColorRgb},${alpha})`;
               ctx.beginPath();
               ctx.moveTo(p.x, p.y);
               ctx.lineTo(p2.x, p2.y);

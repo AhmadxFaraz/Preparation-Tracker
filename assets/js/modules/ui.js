@@ -1,21 +1,21 @@
 (function () {
-  const ACTIVE_FILTER_CLASS = 'px-4 py-2 text-sm font-medium rounded-md bg-blue-100 text-blue-700 transition-colors';
-  const INACTIVE_FILTER_CLASS = 'px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 transition-colors';
+  const ACTIVE_FILTER_CLASS = 'px-4 py-2 text-sm font-semibold rounded-md bg-white/20 text-white border border-white/35 shadow-[0_0_20px_rgba(255,255,255,0.14)] transition-all duration-300';
+  const INACTIVE_FILTER_CLASS = 'px-4 py-2 text-sm font-medium rounded-md text-gray-300 border border-transparent hover:border-white/20 hover:bg-white/10 transition-all duration-300';
 
   const stripeMap = {
-    blue: 'bg-cyan-500',
-    indigo: 'bg-emerald-500',
-    purple: 'bg-amber-500',
-    teal: 'bg-lime-500',
-    amber: 'bg-amber-500'
+    blue: 'bg-cyan-300',
+    indigo: 'bg-indigo-300',
+    purple: 'bg-violet-300',
+    teal: 'bg-teal-300',
+    amber: 'bg-amber-300'
   };
 
   const badgeMap = {
-    blue: 'bg-cyan-100 text-cyan-800',
-    indigo: 'bg-emerald-100 text-emerald-800',
-    purple: 'bg-amber-100 text-amber-800',
-    teal: 'bg-lime-100 text-lime-800',
-    amber: 'bg-amber-100 text-amber-800'
+    blue: 'bg-cyan-500/15 text-cyan-200 border border-cyan-400/25',
+    indigo: 'bg-indigo-500/15 text-indigo-200 border border-indigo-400/25',
+    purple: 'bg-violet-500/15 text-violet-200 border border-violet-400/25',
+    teal: 'bg-teal-500/15 text-teal-200 border border-teal-400/25',
+    amber: 'bg-amber-500/15 text-amber-200 border border-amber-400/25'
   };
 
   function updateFilterButtons(filterType) {
@@ -63,7 +63,7 @@
       const tPercent = tTotal === 0 ? 0 : Math.round((tDone / tTotal) * 100);
 
       const card = document.createElement('div');
-      card.className = 'bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden card-hover flex flex-col';
+      card.className = 'animated-border glow rounded-xl overflow-hidden flex flex-col transition duration-300';
 
       const headerClass = stripeMap[topic.color] || 'bg-gray-500';
       const badgeClass = badgeMap[topic.color] || 'bg-gray-100 text-gray-800';
@@ -76,9 +76,9 @@
             <span class="text-xs font-bold text-gray-400">${tDone}/${tTotal}</span>
           </div>
           <h3 class="text-lg font-bold text-gray-800 mb-1 leading-tight">${topic.title}</h3>
-          <p class="text-xs text-gray-500 mb-4 h-8 overflow-hidden">${topic.description}</p>
-          <div class="w-full bg-gray-200 rounded-full h-1.5 mb-4">
-            <div class="${headerClass} h-1.5 rounded-full transition-all duration-500" style="width: ${tPercent}%"></div>
+          <p class="text-xs text-gray-500 mb-4 min-h-[2rem]">${topic.description}</p>
+          <div class="w-full bg-white/10 rounded-full h-1.5 mb-4">
+            <div class="${headerClass} h-1.5 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(255,255,255,0.26)]" style="width: ${tPercent}%"></div>
           </div>
           <div class="space-y-3">
             ${filteredTasks.map(function (task) {

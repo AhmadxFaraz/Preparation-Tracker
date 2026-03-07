@@ -2,15 +2,21 @@
   --theme-bg: #020202;
   --theme-surface: rgba(13, 13, 13, 0.88);
   --theme-border: rgba(255, 255, 255, 0.2);
-  --theme-cyan: #f3f4f6;
-  --theme-emerald: #ffffff;
-  --theme-amber: #d1d5db;
+  --theme-cyan: #3b82f6;
+  --theme-emerald: #a855f7;
+  --theme-amber: #f97316;
   --theme-text: #f5f5f5;
   --theme-text-soft: #e5e7eb;
   --theme-text-muted: #9ca3af;
   --theme-text-faint: #6b7280;
   --theme-danger-hover: rgba(239, 68, 68, 0.1);
   --theme-card-hover: rgba(255, 255, 255, 0.08);
+  --theme-accent-blue-soft: rgba(59, 130, 246, 0.15);
+  --theme-accent-violet-soft: rgba(168, 85, 247, 0.15);
+  --theme-accent-orange-soft: rgba(249, 115, 22, 0.15);
+  --theme-accent-teal-soft: rgba(20, 184, 166, 0.15);
+  --theme-text-gradient: linear-gradient(100deg, #f8fafc 0%, #60a5fa 34%, #c084fc 68%, #fb923c 100%);
+  --theme-text-gradient-soft: linear-gradient(100deg, #e2e8f0 0%, #93c5fd 42%, #d8b4fe 100%);
 }
 
 .theme-page {
@@ -64,6 +70,11 @@
 }
 
 @keyframes borderFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+@keyframes textShimmer {
   0% { background-position: 0% 50%; }
   100% { background-position: 100% 50%; }
 }
@@ -150,11 +161,12 @@
 .bg-white { background-color: rgba(16, 16, 16, 0.9) !important; }
 .bg-blue-50 { background-color: rgba(22, 22, 22, 0.86) !important; }
 .bg-blue-100 { background-color: rgba(255, 255, 255, 0.18) !important; }
-.text-blue-700, .text-blue-800, .text-blue-600, .text-emerald-500 { color: var(--theme-emerald) !important; }
-.text-gray-800 { color: var(--theme-text) !important; }
-.text-gray-700 { color: var(--theme-text-soft) !important; }
-.text-gray-600, .text-gray-500 { color: var(--theme-text-muted) !important; }
-.text-gray-400 { color: var(--theme-text-faint) !important; }
+.text-blue-700, .text-blue-800, .text-blue-600 { color: #60a5fa !important; }
+.text-emerald-500 { color: #c084fc !important; }
+.text-gray-900, .text-gray-800 { color: #f8fafc !important; }
+.text-gray-700 { color: #e2e8f0 !important; }
+.text-gray-600, .text-gray-500 { color: #cbd5e1 !important; }
+.text-gray-400 { color: #9ca3af !important; }
 .border-gray-200, .border-gray-100 { border-color: var(--theme-border) !important; }
 .hover\:bg-gray-50:hover { background-color: var(--theme-card-hover) !important; }
 .hover\:bg-red-50:hover { background-color: var(--theme-danger-hover) !important; }
@@ -225,6 +237,80 @@
 .site-github-link:hover {
   border-color: rgba(255, 255, 255, 0.42);
   color: #ffffff;
+}
+
+/* Keep gradient styling focused on major headings for readability. */
+.theme-page :where(h1, .gradient-heading) {
+  background-image: var(--theme-text-gradient);
+  background-size: 240% 240%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  -webkit-text-fill-color: transparent;
+  animation: textShimmer 10s linear infinite;
+}
+
+/* Preserve readable plain text in form controls/placeholders. */
+input[type="email"], input[type="password"], input[type="text"], textarea {
+  color: #f8fafc !important;
+  -webkit-text-fill-color: #f8fafc !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #94a3b8 !important;
+  -webkit-text-fill-color: #94a3b8 !important;
+}
+
+/* Distinct heading colors for homepage subject cards. */
+body.theme-page section.max-w-6xl > a:nth-child(1) h3 { color: #60a5fa !important; }
+body.theme-page section.max-w-6xl > a:nth-child(2) h3 { color: #22d3ee !important; }
+body.theme-page section.max-w-6xl > a:nth-child(3) h3 { color: #c084fc !important; }
+body.theme-page section.max-w-6xl > a:nth-child(4) h3 { color: #a78bfa !important; }
+body.theme-page section.max-w-6xl > a:nth-child(5) h3 { color: #fb923c !important; }
+body.theme-page section.max-w-6xl > a:nth-child(6) h3 { color: #2dd4bf !important; }
+
+/* Distinct heading colors for unit cards on subject index pages. */
+body.theme-page section.max-w-5xl > a:nth-child(1) h3 { color: #60a5fa !important; }
+body.theme-page section.max-w-5xl > a:nth-child(2) h3 { color: #22d3ee !important; }
+body.theme-page section.max-w-5xl > a:nth-child(3) h3 { color: #c084fc !important; }
+body.theme-page section.max-w-5xl > a:nth-child(4) h3 { color: #fb923c !important; }
+
+/* Global utility remap: keep all pages on the same accent palette as index.html. */
+.text-cyan-300, .text-cyan-400 { color: #60a5fa !important; }
+.text-cyan-200 { color: #93c5fd !important; }
+.text-emerald-300, .text-emerald-500 { color: #c084fc !important; }
+.text-emerald-200 { color: #d8b4fe !important; }
+.text-amber-300, .text-amber-500 { color: #fb923c !important; }
+.text-amber-200 { color: #fdba74 !important; }
+.text-slate-300 { color: #cbd5e1 !important; }
+.text-slate-400, .text-zinc-400 { color: #9ca3af !important; }
+
+.bg-cyan-500\/20 { background-color: var(--theme-accent-blue-soft) !important; }
+.bg-emerald-500\/20 { background-color: var(--theme-accent-violet-soft) !important; }
+.bg-amber-500\/20 { background-color: var(--theme-accent-orange-soft) !important; }
+.bg-teal-500\/20 { background-color: var(--theme-accent-teal-soft) !important; }
+
+/* Keep form controls/buttons visually aligned with homepage cards. */
+input[type="email"], input[type="password"], input[type="text"] {
+  border-color: rgba(255, 255, 255, 0.22) !important;
+  background-color: rgba(9, 9, 9, 0.78) !important;
+  color: #f8fafc !important;
+}
+
+input[type="email"]:focus, input[type="password"]:focus, input[type="text"]:focus {
+  border-color: rgba(96, 165, 250, 0.7) !important;
+  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.45);
+}
+
+button#signin-btn, button#signup-btn, button#signout-btn, button#forgot-password-btn, button#update-password-btn {
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+button#signin-btn:hover, button#signup-btn:hover, button#signout-btn:hover, button#forgot-password-btn:hover, button#update-password-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.42), 0 0 24px rgba(255, 255, 255, 0.08);
 }
 
 @media (max-width: 640px) {
