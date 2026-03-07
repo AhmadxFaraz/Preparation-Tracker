@@ -99,9 +99,21 @@
 
   async function sendPasswordResetEmail(email) {
     const client = window.SupabaseClient.getClient();
-    const redirectTo = `${window.location.origin}${window.location.pathname}`;
+    const redirectTo = getPasswordResetRedirectUrl();
     const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo });
     if (error) throw error;
+  }
+
+  function getPasswordResetRedirectUrl() {
+    const explicit = String(window.SUPABASE_AUTH_REDIRECT_URL || '').trim();
+    if (explicit) return explicit;
+
+    // Fallback: keep reset flow on this app's login page even in subdirectories.
+    try {
+      return new URL('login.html', window.location.href).toString();
+    } catch (_) {
+      return `${window.location.origin}/login.html`;
+    }
   }
 
   async function updatePassword(newPassword) {
