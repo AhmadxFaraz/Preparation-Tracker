@@ -49,17 +49,34 @@
       return;
     }
 
-    legend.innerHTML = stats.map(function (topic) {
+    const legendRows = stats.map(function (topic) {
       return `
         <div class="flex items-center justify-between gap-3 text-xs text-gray-300">
           <div class="flex items-center gap-2 min-w-0">
-            <span class="inline-block w-6 h-2 rounded-full border border-white/20 shrink-0" style="background: linear-gradient(90deg, ${topic.pastel}, ${topic.vibrant});"></span>
+            <span class="inline-flex w-7 h-2 rounded-full border border-white/20 shrink-0 overflow-hidden">
+              <span class="w-1/2 h-full" style="background: linear-gradient(120deg, ${topic.pastel}, rgba(15, 23, 42, 0.45));"></span>
+              <span class="w-1/2 h-full shadow-[0_0_10px_rgba(255,255,255,0.55)]" style="background: linear-gradient(120deg, ${topic.vibrant}, rgba(255, 255, 255, 0.28));"></span>
+            </span>
             <span class="truncate">${topic.shortLabel}</span>
           </div>
           <span class="font-medium text-gray-200 shrink-0">${topic.done}/${topic.total} (${topic.percent}%)</span>
         </div>
       `;
     }).join('');
+
+    legend.innerHTML = `
+      <div class="flex items-center justify-center gap-5 text-[11px] text-gray-400 mb-1">
+        <span class="inline-flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.55)]"></span>
+          Completed
+        </span>
+        <span class="inline-flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-slate-500/40 border border-white/20"></span>
+          Remaining
+        </span>
+      </div>
+      ${legendRows}
+    `;
   }
 
   function renderTasks(app) {

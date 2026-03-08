@@ -1,11 +1,65 @@
 (function () {
   const TOPIC_PALETTE = {
-    blue: { vibrant: '#22d3ee', pastel: '#164e63' },
-    indigo: { vibrant: '#818cf8', pastel: '#312e81' },
-    purple: { vibrant: '#c084fc', pastel: '#581c87' },
-    teal: { vibrant: '#2dd4bf', pastel: '#134e4a' },
-    amber: { vibrant: '#fbbf24', pastel: '#78350f' },
-    fallback: { vibrant: '#94a3b8', pastel: '#334155' }
+    blue: {
+      vibrant: 'rgba(68, 238, 255, 0.98)',
+      remaining: 'rgba(68, 238, 255, 0.16)',
+      doneStart: 'rgba(18, 197, 255, 0.95)',
+      doneEnd: 'rgba(120, 250, 255, 1)',
+      doneHoverStart: 'rgba(120, 250, 255, 1)',
+      doneHoverEnd: 'rgba(203, 255, 255, 1)',
+      remainingStart: 'rgba(36, 104, 122, 0.28)',
+      remainingEnd: 'rgba(16, 45, 56, 0.18)'
+    },
+    indigo: {
+      vibrant: 'rgba(164, 173, 255, 0.98)',
+      remaining: 'rgba(164, 173, 255, 0.16)',
+      doneStart: 'rgba(117, 135, 255, 0.95)',
+      doneEnd: 'rgba(194, 206, 255, 1)',
+      doneHoverStart: 'rgba(194, 206, 255, 1)',
+      doneHoverEnd: 'rgba(231, 236, 255, 1)',
+      remainingStart: 'rgba(74, 87, 141, 0.28)',
+      remainingEnd: 'rgba(36, 42, 77, 0.18)'
+    },
+    purple: {
+      vibrant: 'rgba(222, 145, 255, 0.98)',
+      remaining: 'rgba(222, 145, 255, 0.16)',
+      doneStart: 'rgba(188, 106, 255, 0.95)',
+      doneEnd: 'rgba(233, 177, 255, 1)',
+      doneHoverStart: 'rgba(233, 177, 255, 1)',
+      doneHoverEnd: 'rgba(246, 221, 255, 1)',
+      remainingStart: 'rgba(103, 58, 133, 0.28)',
+      remainingEnd: 'rgba(53, 23, 77, 0.18)'
+    },
+    teal: {
+      vibrant: 'rgba(93, 248, 220, 0.98)',
+      remaining: 'rgba(93, 248, 220, 0.16)',
+      doneStart: 'rgba(45, 226, 190, 0.95)',
+      doneEnd: 'rgba(164, 255, 233, 1)',
+      doneHoverStart: 'rgba(164, 255, 233, 1)',
+      doneHoverEnd: 'rgba(221, 255, 244, 1)',
+      remainingStart: 'rgba(52, 120, 109, 0.28)',
+      remainingEnd: 'rgba(21, 62, 56, 0.18)'
+    },
+    amber: {
+      vibrant: 'rgba(255, 215, 102, 0.98)',
+      remaining: 'rgba(255, 215, 102, 0.18)',
+      doneStart: 'rgba(255, 195, 63, 0.95)',
+      doneEnd: 'rgba(255, 231, 165, 1)',
+      doneHoverStart: 'rgba(255, 231, 165, 1)',
+      doneHoverEnd: 'rgba(255, 245, 211, 1)',
+      remainingStart: 'rgba(132, 99, 44, 0.30)',
+      remainingEnd: 'rgba(77, 58, 23, 0.20)'
+    },
+    fallback: {
+      vibrant: 'rgba(203, 213, 225, 0.96)',
+      remaining: 'rgba(148, 163, 184, 0.20)',
+      doneStart: 'rgba(148, 163, 184, 0.92)',
+      doneEnd: 'rgba(226, 232, 240, 1)',
+      doneHoverStart: 'rgba(226, 232, 240, 1)',
+      doneHoverEnd: 'rgba(248, 250, 252, 1)',
+      remainingStart: 'rgba(100, 116, 139, 0.28)',
+      remainingEnd: 'rgba(51, 65, 85, 0.18)'
+    }
   };
 
   const centerTextPlugin = {
@@ -31,8 +85,43 @@
     }
   };
 
+  const segmentGlowPlugin = {
+    id: 'segmentGlow',
+    afterDatasetsDraw: function (chart) {
+      const segmentMeta = chart.$segmentMeta || [];
+      const dataset = chart.data && chart.data.datasets && chart.data.datasets[0];
+      const meta = chart.getDatasetMeta(0);
+      if (!dataset || !meta || !meta.data) return;
+
+      meta.data.forEach(function (arc, index) {
+        const segment = segmentMeta[index];
+        const value = Array.isArray(dataset.data) ? dataset.data[index] : 0;
+        if (!segment || segment.state !== 'Done' || !value) return;
+
+        const glowColor = Array.isArray(dataset.hoverBackgroundColor)
+          ? dataset.hoverBackgroundColor[index]
+          : (Array.isArray(dataset.backgroundColor) ? dataset.backgroundColor[index] : 'rgba(255,255,255,0.9)');
+
+        const ctx = chart.ctx;
+        const radius = (arc.innerRadius + arc.outerRadius) / 2;
+        const width = Math.max(2, (arc.outerRadius - arc.innerRadius) * 0.56);
+
+        ctx.save();
+        ctx.globalAlpha = 0.22;
+        ctx.strokeStyle = glowColor;
+        ctx.lineWidth = width;
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.65)';
+        ctx.shadowBlur = 20;
+        ctx.beginPath();
+        ctx.arc(arc.x, arc.y, radius, arc.startAngle, arc.endAngle);
+        ctx.stroke();
+        ctx.restore();
+      });
+    }
+  };
+
   if (typeof Chart !== 'undefined' && Chart.register) {
-    Chart.register(centerTextPlugin);
+    Chart.register(centerTextPlugin, segmentGlowPlugin);
   }
 
   function safePercent(done, total) {
@@ -63,7 +152,13 @@
         remaining: remaining,
         percent: safePercent(done, total),
         vibrant: palette.vibrant,
-        pastel: palette.pastel
+        pastel: palette.remaining,
+        doneStart: palette.doneStart,
+        doneEnd: palette.doneEnd,
+        doneHoverStart: palette.doneHoverStart,
+        doneHoverEnd: palette.doneHoverEnd,
+        remainingStart: palette.remainingStart,
+        remainingEnd: palette.remainingEnd
       };
     });
   }
@@ -71,22 +166,47 @@
   function buildTopicDataset(topicStats) {
     const labels = [];
     const data = [];
-    const colors = [];
+    const hoverOffsets = [];
     const segmentMeta = [];
 
     topicStats.forEach(function (topic) {
       labels.push(`${topic.shortLabel} Done`);
       data.push(topic.done);
-      colors.push(topic.vibrant);
+      hoverOffsets.push(9);
       segmentMeta.push({ topicIndex: topic.topicIndex, state: 'Done' });
 
       labels.push(`${topic.shortLabel} Remaining`);
       data.push(topic.remaining);
-      colors.push(topic.pastel);
+      hoverOffsets.push(1);
       segmentMeta.push({ topicIndex: topic.topicIndex, state: 'Remaining' });
     });
 
-    return { labels, data, colors, segmentMeta };
+    return { labels, data, hoverOffsets, segmentMeta };
+  }
+
+  function makeGradient(chart, start, end, fallback) {
+    const area = chart.chartArea;
+    if (!area) return fallback || end;
+    const gradient = chart.ctx.createLinearGradient(area.left, area.top, area.right, area.bottom);
+    gradient.addColorStop(0, start);
+    gradient.addColorStop(1, end);
+    return gradient;
+  }
+
+  function buildGradientColors(chart, topicStats, segmentMeta, isHover) {
+    return segmentMeta.map(function (segment) {
+      const topic = topicStats[segment.topicIndex];
+      if (!topic) return isHover ? 'rgba(248, 250, 252, 0.85)' : 'rgba(100, 116, 139, 0.35)';
+
+      if (segment.state === 'Done') {
+        if (isHover) {
+          return makeGradient(chart, topic.doneHoverStart, topic.doneHoverEnd, topic.vibrant);
+        }
+        return makeGradient(chart, topic.doneStart, topic.doneEnd, topic.vibrant);
+      }
+
+      return makeGradient(chart, topic.remainingStart, topic.remainingEnd, topic.pastel);
+    });
   }
 
   function getTooltipTopic(chart, dataIndex) {
@@ -113,7 +233,9 @@
           datasets: [{
             data: [],
             backgroundColor: [],
-            borderWidth: 0,
+            hoverBackgroundColor: [],
+            borderColor: 'rgba(248, 250, 252, 0.24)',
+            borderWidth: 1,
             hoverOffset: 4
           }]
         },
@@ -173,9 +295,14 @@
     const dataset = buildTopicDataset(topicStats);
 
     if (targetCharts.progress) {
+      const progressDataset = targetCharts.progress.data.datasets[0];
       targetCharts.progress.data.labels = dataset.labels;
-      targetCharts.progress.data.datasets[0].data = dataset.data;
-      targetCharts.progress.data.datasets[0].backgroundColor = dataset.colors;
+      progressDataset.data = dataset.data;
+      progressDataset.backgroundColor = buildGradientColors(targetCharts.progress, topicStats, dataset.segmentMeta, false);
+      progressDataset.hoverBackgroundColor = buildGradientColors(targetCharts.progress, topicStats, dataset.segmentMeta, true);
+      progressDataset.hoverOffset = dataset.hoverOffsets;
+      progressDataset.borderColor = 'rgba(248, 250, 252, 0.24)';
+      progressDataset.borderWidth = 1;
       targetCharts.progress.options.plugins.centerText.text = `${counts.percent}%`;
       targetCharts.progress.$topicStats = topicStats;
       targetCharts.progress.$segmentMeta = dataset.segmentMeta;
