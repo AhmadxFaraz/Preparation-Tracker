@@ -4,8 +4,8 @@ This file is for your personal learning and architecture understanding.
 
 Current status:
 
-- Implemented sections: AMS I and AMS II (8 units total)
-- Planned: additional Math sections to be added in the same architecture
+- Implemented sections: AMS I, AMS II, HM I, HM II, Discrete Structures, Numerical Techniques, and Advanced Numerical Methods
+- Additional sections can continue using the same subject -> unit -> data/main architecture
 
 ## 1) What each language/file does
 

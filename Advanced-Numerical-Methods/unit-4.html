@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AM04430: Unit IV Interactive Study Plan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/theme.css?v=5" />
+    <link rel="stylesheet" href="../assets/css/unit-dashboard.css" />
+</head>
+<body class="theme-page about-bottom-left min-h-screen flex flex-col text-slate-100">
+
+    <canvas id="bgCanvas" data-bg-mode="particles" data-particle-count="130" data-particle-size="2.2" data-particle-speed="1" data-link-distance="120"></canvas>
+
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">AM04430: Unit IV</h1>
+                <p class="text-sm text-gray-500">Advanced Numerical Methods • AhmadxFaraz</p>
+                <a href="index.html" class="inline-block mt-2 text-xs mono text-cyan-300 hover:text-cyan-200 transition-colors">
+                    ← Back to Advanced Numerical Methods
+                </a>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="app.resetProgress()" class="text-sm text-red-500 hover:text-red-700 font-medium transition-colors px-3 py-2 rounded hover:bg-red-50">
+                    Reset Progress
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <section class="mb-8">
+            <div class="bg-blue-50 border-l-4 border-cyan-500 p-4 rounded-r-lg">
+                <h2 class="text-lg font-semibold text-blue-800 mb-1">Study Dashboard</h2>
+                <p class="text-blue-700 text-sm">
+                    Unit IV gives you a structured checklist for the <strong>finite element method</strong>, including <strong>variational formulation</strong>, <strong>Rayleigh-Ritz approximation</strong>, <strong>weighted residual methods</strong>, and <strong>one-dimensional FEM assembly</strong>.
+                </p>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 gap-6 mb-10">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center">
+                <h3 class="text-gray-700 font-medium mb-4 w-full text-left border-b pb-2">Topic-Wise Progress</h3>
+                <div class="chart-container">
+                    <canvas id="progressChart"></canvas>
+                </div>
+                <div id="topic-progress-legend" class="mt-4 w-full space-y-2"></div>
+                <div id="motivation-text" class="mt-4 text-sm font-medium text-gray-500 text-center italic">
+                    "Finite elements reward patience, structure, and clean notation."
+                </div>
+            </div>
+        </section>
+
+        <section class="flex flex-col sm:flex-row justify-between items-center mb-6 sticky top-20 z-10 bg-transparent py-2">
+            <h2 class="text-xl font-bold text-gray-800 mb-4 sm:mb-0">Syllabus Topics</h2>
+            <div class="flex space-x-2 bg-white p-1 rounded-lg border border-gray-200 shadow-sm">
+                <button onclick="app.setFilter('all')" id="btn-all" class="px-4 py-2 text-sm font-medium rounded-md bg-blue-100 text-blue-700 transition-colors">All</button>
+                <button onclick="app.setFilter('incomplete')" id="btn-incomplete" class="px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 transition-colors">To Do</button>
+                <button onclick="app.setFilter('completed')" id="btn-completed" class="px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 transition-colors">Done</button>
+            </div>
+        </section>
+
+        <div id="topic-grid" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-400 text-sm">
+            <p>Based on AM04430 Unit 4 syllabus</p>
+            <p class="mt-2">This page is ready for finite-element worked problems whenever you want to add them.</p>
+        </div>
+    </footer>
+
+    <script src="../assets/theme.js?v=4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase-config.js"></script>
+    <script src="../assets/js/supabase-client.js?v=7"></script>
+    <script src="../assets/js/modules/cloud-sync.js?v=7"></script>
+    <script src="../assets/js/modules/storage.js?v=7"></script>
+    <script src="../assets/js/modules/charts.js"></script>
+    <script src="../assets/js/modules/ui.js"></script>
+    <script src="../assets/js/modules/app-core.js?v=7"></script>
+    <script src="../assets/js/anm-unit-4.data.js"></script>
+    <script src="../assets/js/anm-unit-4.main.js"></script>
+</body>
+</html>
