@@ -17,7 +17,9 @@
   function getAboutHref() {
     const path = window.location.pathname || '';
     const inAboutDir = /\/about\//.test(path);
-    const inSubDir = /\/Applied-Mathematics-I\/|\/Applied-Mathematics-II\//.test(path);
+    const normalizedPath = path.replace(/\/+$/, '');
+    const segments = normalizedPath.split('/').filter(Boolean);
+    const inSubDir = segments.length > 1 && !inAboutDir;
     if (inAboutDir) return 'about.html';
     return inSubDir ? '../about/about.html' : 'about/about.html';
   }
