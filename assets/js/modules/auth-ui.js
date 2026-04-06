@@ -17,6 +17,18 @@
     const message = raw.toLowerCase();
     const code = String((err && (err.code || err.error_code || err.status)) || '').toLowerCase();
 
+    if (
+      message.includes('invalid email') ||
+      message.includes('email address is invalid') ||
+      message.includes('unable to validate email')
+    ) {
+      return 'Enter a valid email address and try again.';
+    }
+
+    if (message.includes('user already registered') || message.includes('already been registered')) {
+      return 'An account with this email already exists. Try signing in instead.';
+    }
+
     if (message.includes('invalid login credentials') || message.includes('invalid credentials')) {
       return 'Incorrect email or password. Please try again.';
     }
@@ -287,10 +299,37 @@
       setStatus('Email and password are required.', true);
       return false;
     }
+
+    if (!isValidEmail(email)) {
+      setStatus('Enter a valid email address.', true);
+      return false;
+    }
+
     if (password.length < MIN_PASSWORD_LENGTH) {
       setStatus(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`, true);
       return false;
     }
+    return true;
+  }
+
+  function isValidEmail(email) {
+    const value = String(email || '').trim();
+    if (!value) return false;
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  }
+
+  function validateEmailOnly(email, emptyMessage) {
+    const value = String(email || '').trim();
+    if (!value) {
+      setStatus(emptyMessage || 'Email is required.', true);
+      return false;
+    }
+
+    if (!isValidEmail(value)) {
+      setStatus('Enter a valid email address.', true);
+      return false;
+    }
+
     return true;
   }
 
@@ -369,8 +408,7 @@
 
     async function submitForgotPassword() {
       const email = (document.getElementById('email') || { value: '' }).value.trim();
-      if (!email) {
-        setStatus('Enter your email first, then click Forgot Password.', true);
+      if (!validateEmailOnly(email, 'Enter your email first, then click Forgot Password.')) {
         return;
       }
 
@@ -485,6 +523,10 @@
       const password = (document.getElementById('password') || { value: '' }).value;
 
       if (!validateCredentials(email, password)) return;
+      if (!fullName) {
+        setStatus('Please enter your full name.', true);
+        return;
+      }
 
       try {
         setStatus('Creating account...');
