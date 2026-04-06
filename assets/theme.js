@@ -16,10 +16,12 @@
 
   function getAboutHref() {
     const path = window.location.pathname || '';
-    const inAboutDir = /\/about\//.test(path);
     const normalizedPath = path.replace(/\/+$/, '');
     const segments = normalizedPath.split('/').filter(Boolean);
-    const inSubDir = segments.length > 1 && !inAboutDir;
+    const looksLikeFile = segments.length > 0 && /\.[a-z0-9]+$/i.test(segments[segments.length - 1]);
+    const directorySegments = looksLikeFile ? segments.slice(0, -1) : segments.slice();
+    const inAboutDir = directorySegments.includes('about');
+    const inSubDir = directorySegments.length > 1 && !inAboutDir;
     if (inAboutDir) return 'about.html';
     return inSubDir ? '../about/about.html' : 'about/about.html';
   }
