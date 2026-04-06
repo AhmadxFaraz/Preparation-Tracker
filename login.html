@@ -13,8 +13,8 @@
 
   <main class="animated-border max-w-md w-full p-7">
     <p class="mono text-xs text-cyan-300 tracking-widest uppercase">Account</p>
-    <h1 class="text-3xl font-extrabold mt-2">Sign In</h1>
-    <p class="text-slate-300 mt-3 text-sm">Sign in to sync your preparation progress across devices.</p>
+    <h1 id="auth-page-title" class="text-3xl font-extrabold mt-2">Sign In</h1>
+    <p id="auth-page-copy" class="text-slate-300 mt-3 text-sm">Sign in to sync your preparation progress across devices.</p>
 
     <div id="auth-user" class="mt-4 text-sm text-slate-300">Checking session...</div>
 
@@ -72,7 +72,7 @@
   <script src="assets/js/supabase-config.js"></script>
   <script src="assets/js/supabase-client.js?v=7"></script>
   <script src="assets/js/modules/cloud-sync.js?v=7"></script>
-  <script src="assets/js/modules/auth-ui.js?v=3"></script>
+  <script src="assets/js/modules/auth-ui.js?v=4"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       window.AuthUI.initLoginPage();

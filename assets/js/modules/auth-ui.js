@@ -233,6 +233,40 @@
       form.classList.remove('hidden');
       if (switchLink) switchLink.classList.remove('hidden');
     }
+
+    updateAuthPageChrome(user);
+  }
+
+  function updateAuthPageChrome(user, isRecoveryMode) {
+    const title = document.getElementById('auth-page-title');
+    const copy = document.getElementById('auth-page-copy');
+    if (!title || !copy) return;
+
+    const isSignupPage = Boolean(document.getElementById('signup-btn'));
+    const isLoginPage = Boolean(document.getElementById('signin-btn'));
+
+    if (isRecoveryMode) {
+      title.textContent = 'Reset Password';
+      copy.textContent = 'Set a new password to finish recovering your account.';
+      return;
+    }
+
+    if (user) {
+      title.textContent = 'Account Active';
+      copy.textContent = 'You are signed in and your progress can now sync across devices.';
+      return;
+    }
+
+    if (isSignupPage) {
+      title.textContent = 'Sign Up';
+      copy.textContent = 'Create your account to keep progress saved across devices.';
+      return;
+    }
+
+    if (isLoginPage) {
+      title.textContent = 'Sign In';
+      copy.textContent = 'Sign in to sync your preparation progress across devices.';
+    }
   }
 
   function setButtonsBusy(buttons, isBusy) {
@@ -399,6 +433,7 @@
       recoveryForm.classList.add('hidden');
       if (switchLink) switchLink.classList.remove('hidden');
       if (userBox) userBox.textContent = 'Not logged in';
+      updateAuthPageChrome(null, false);
     }
 
     function setRecoveryModeUi() {
@@ -407,6 +442,7 @@
       recoveryForm.classList.remove('hidden');
       if (switchLink) switchLink.classList.add('hidden');
       if (userBox) userBox.textContent = 'Password recovery mode';
+      updateAuthPageChrome(null, true);
     }
 
     async function submitSignIn() {
