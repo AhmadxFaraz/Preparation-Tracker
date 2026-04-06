@@ -142,10 +142,72 @@
     }
   }
 
+  function getPromptStorage() {
+    try {
+      return window.sessionStorage;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function isAuthPromptDismissed() {
+    const storage = getPromptStorage();
+    return storage ? storage.getItem('tracker_auth_prompt_dismissed_v1') === 'true' : false;
+  }
+
+  function markAuthPromptDismissed() {
+    const storage = getPromptStorage();
+    if (!storage) return;
+    storage.setItem('tracker_auth_prompt_dismissed_v1', 'true');
+  }
+
+  function hideAuthPrompt() {
+    const existing = document.getElementById('tracker-auth-prompt');
+    if (existing) existing.remove();
+  }
+
+  function showAuthPrompt() {
+    if (document.getElementById('tracker-auth-prompt') || isAuthPromptDismissed()) return;
+
+    const loginUrl = new URL('../login.html', window.location.href).toString();
+    const signupUrl = new URL('../signup.html', window.location.href).toString();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'tracker-auth-prompt';
+    overlay.className = 'tracker-auth-prompt-backdrop';
+    overlay.innerHTML = `
+      <div class="tracker-auth-prompt-panel" role="dialog" aria-modal="true" aria-labelledby="tracker-auth-prompt-title">
+        <button type="button" class="tracker-auth-prompt-close" aria-label="Close prompt">&times;</button>
+        <p class="tracker-auth-prompt-kicker">Save your progress</p>
+        <h2 id="tracker-auth-prompt-title" class="tracker-auth-prompt-title">Create an account or log in</h2>
+        <p class="tracker-auth-prompt-copy">
+          Your checklist works without an account, but signing in lets you save progress to the cloud and continue from any device.
+        </p>
+        <div class="tracker-auth-prompt-actions">
+          <a href="${signupUrl}" class="tracker-auth-prompt-primary">Create account</a>
+          <a href="${loginUrl}" class="tracker-auth-prompt-secondary">Log in</a>
+        </div>
+        <p class="tracker-auth-prompt-note">If you stay signed out, progress remains only on this device.</p>
+      </div>
+    `;
+
+    const closeButton = overlay.querySelector('.tracker-auth-prompt-close');
+    if (closeButton) {
+      closeButton.addEventListener('click', function () {
+        markAuthPromptDismissed();
+        hideAuthPrompt();
+      });
+    }
+
+    document.body.appendChild(overlay);
+  }
+
   window.TrackerUI = {
     renderTasks,
     updateFilterButtons,
     updateStats,
-    updateTopicLegend
+    updateTopicLegend,
+    showAuthPrompt,
+    hideAuthPrompt
   };
 })();

@@ -137,6 +137,7 @@
       // Re-sync on auth restoration/sign-in events.
       client.auth.onAuthStateChange(function () {
         tryCloudPull(app);
+        syncAuthPrompt();
       });
 
       // Session hydration can lag on first load in some browsers.
@@ -161,6 +162,21 @@
       }
     }
 
+    async function syncAuthPrompt() {
+      if (!window.TrackerUI || !window.TrackerUI.showAuthPrompt || !window.TrackerUI.hideAuthPrompt) return;
+      if (!window.SupabaseClient || !window.SupabaseClient.isConfigured()) return;
+
+      const user = window.TrackerCloud && window.TrackerCloud.getUser
+        ? await window.TrackerCloud.getUser()
+        : null;
+
+      if (user) {
+        window.TrackerUI.hideAuthPrompt();
+      } else {
+        window.TrackerUI.showAuthPrompt();
+      }
+    }
+
     return {
       data: resolveInitialData(),
       filter: 'all',
@@ -174,6 +190,7 @@
         this.updateStats();
         bindCloudAuthSync(this);
         tryCloudPull(this);
+        syncAuthPrompt();
       },
 
       save: function () {
