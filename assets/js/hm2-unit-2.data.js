@@ -22,14 +22,5 @@ const studyData = [
       { id: "u2_t2_2", text: "Theory: Numerical integration", type: "theory", completed: false },
       { id: "u2_t2_3", text: "Theory: Gaussian quadrature", type: "theory", completed: false }
     ]
-  },
-  {
-    id: "topic_3",
-    title: "3. Lecture Plan Pending",
-    description: "Unit 2 lecture plan has not been provided yet.",
-    color: "amber",
-    tasks: [
-      { id: "u2_t3_1", text: "Add Unit 2 lecture plan PDF to expand problem-wise tasks", type: "note", completed: false }
-    ]
   }
 ];

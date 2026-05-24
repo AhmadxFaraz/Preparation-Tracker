@@ -32,14 +32,5 @@ const studyData = [
       { id: "u4_t3_2", text: "Theory: Binomial distribution", type: "theory", completed: false },
       { id: "u4_t3_3", text: "Theory: Normal distribution", type: "theory", completed: false }
     ]
-  },
-  {
-    id: "topic_4",
-    title: "4. Lecture Plan Pending",
-    description: "Unit 4 lecture plan has not been provided yet.",
-    color: "amber",
-    tasks: [
-      { id: "u4_t4_1", text: "Add Unit 4 lecture plan PDF to expand problem-wise tasks", type: "note", completed: false }
-    ]
   }
 ];

@@ -30,14 +30,5 @@ const studyData = [
       { id: "nt4_t3_1", text: "Theory: Duality", type: "theory", completed: false },
       { id: "nt4_t3_2", text: "Theory: Introduction to nonlinear programming", type: "theory", completed: false }
     ]
-  },
-  {
-    id: "topic_4",
-    title: "4. Lecture Plan Extension",
-    description: "Keep room for later optimization drill questions.",
-    color: "amber",
-    tasks: [
-      { id: "nt4_t4_1", text: "Add graphical/simplex/duality questions after selecting your source material", type: "note", completed: false }
-    ]
   }
 ];

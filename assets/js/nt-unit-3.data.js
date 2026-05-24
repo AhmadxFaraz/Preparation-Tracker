@@ -30,14 +30,5 @@ const studyData = [
       { id: "nt3_t3_1", text: "Theory: Random number generations", type: "theory", completed: false },
       { id: "nt3_t3_2", text: "Practice: Note one standard pseudo-random sequence generation method", type: "problem", completed: false }
     ]
-  },
-  {
-    id: "topic_4",
-    title: "4. Lecture Plan Extension",
-    description: "Space reserved for a future detailed problem list.",
-    color: "amber",
-    tasks: [
-      { id: "nt3_t4_1", text: "Add selected Unit 3 approximation questions later", type: "note", completed: false }
-    ]
   }
 ];

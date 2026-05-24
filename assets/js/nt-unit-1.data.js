@@ -31,13 +31,4 @@ const studyData = [
       { id: "nt1_t3_2", text: "Practice: Review one matrix eigen value iteration example", type: "problem", completed: false }
     ]
   },
-  {
-    id: "topic_4",
-    title: "4. Lecture Plan Extension",
-    description: "Space for future worked examples and book questions.",
-    color: "amber",
-    tasks: [
-      { id: "nt1_t4_1", text: "Add selected Unit 1 problems when you finalize the practice list", type: "note", completed: false }
-    ]
-  }
 ];

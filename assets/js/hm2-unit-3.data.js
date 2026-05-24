@@ -21,14 +21,5 @@ const studyData = [
       { id: "u3_t2_1", text: "Theory: Numerical solution of two-point boundary value problems", type: "theory", completed: false },
       { id: "u3_t2_2", text: "Theory: Finite difference method for BVP", type: "theory", completed: false }
     ]
-  },
-  {
-    id: "topic_3",
-    title: "3. Lecture Plan Pending",
-    description: "Unit 3 lecture plan has not been provided yet.",
-    color: "amber",
-    tasks: [
-      { id: "u3_t3_1", text: "Add Unit 3 lecture plan PDF to expand problem-wise tasks", type: "note", completed: false }
-    ]
   }
 ];

@@ -30,14 +30,5 @@ const studyData = [
       { id: "nt2_t3_1", text: "Theory: Spline interpolation", type: "theory", completed: false },
       { id: "nt2_t3_2", text: "Practice: Review a basic spline construction example", type: "problem", completed: false }
     ]
-  },
-  {
-    id: "topic_4",
-    title: "4. Lecture Plan Extension",
-    description: "Place to add book-specific interpolation problems later.",
-    color: "amber",
-    tasks: [
-      { id: "nt2_t4_1", text: "Add selected interpolation questions when the detailed lecture plan is available", type: "note", completed: false }
-    ]
   }
 ];
